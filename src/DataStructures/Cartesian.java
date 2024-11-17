@@ -1,6 +1,7 @@
 package DataStructures;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Cartesian implements StateSpace<Vector> {
 
@@ -9,10 +10,17 @@ public class Cartesian implements StateSpace<Vector> {
 	private final GoalTester goalTester;
 	private final Measurement measurement = Measurement.EUCLIDEAN;
 	
-	public Cartesian(int dimensions, GoalTester goalTester) {
+	public Cartesian(int dimensions, int multiDimensionalMoveLimit, GoalTester goalTester) {
 		this.dimensions = dimensions;
-		this.multiDimensionalMoveLimit = dimensions;
+		this.multiDimensionalMoveLimit = multiDimensionalMoveLimit;
 		this.goalTester = goalTester;
+	}
+	
+	public Cartesian(int multiDimensionalMoveLimit, Vector...goals) {
+		this.dimensions = goals[0].getDimensions();
+		ArrayList<Vector> goalVectors = (ArrayList<Vector>) Arrays.asList(goals);
+		this.goalTester = (vector) -> goalVectors.contains(vector);
+		this.multiDimensionalMoveLimit = multiDimensionalMoveLimit;
 	}
 	
 	@Override

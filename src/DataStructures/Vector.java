@@ -7,7 +7,7 @@ public class Vector {
 		this.components = new double[dimensions];
 	}
 	
-	public Vector(double[] components) {
+	public Vector(double... components) {
 		this.components = components.clone();
 	}
 	
@@ -52,5 +52,18 @@ public class Vector {
 	@Override
 	public Object clone() {
 		return new Vector(components);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj == this) return true;
+		if(obj == null) return false;
+		if(obj.getClass() != Vector.class) return false;
+		Vector other = (Vector) obj;
+		if(getDimensions() != other.getDimensions()) return false;
+		for(int i = 0; i < getDimensions(); i++) {
+			if(get(i) != other.get(i)) return false;
+		}
+		return true;
 	}
 }
