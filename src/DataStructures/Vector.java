@@ -1,7 +1,7 @@
 package DataStructures;
 
 public class Vector {
-	double[] components;
+	private double[] components;
 	
 	public Vector(int dimensions) {
 		this.components = new double[dimensions];
@@ -19,7 +19,11 @@ public class Vector {
 		return components[dimension];
 	}
 	
-	public double getEuclideanDistance(Vector other, Measurement measurement) {
+	public void set(int dimension, double value) {
+		components[dimension] = value;
+	}
+	
+	public double distance(Vector other, Measurement measurement) {
 		if(other.getDimensions() != this.getDimensions()) return -1;
 		double dist = 0;
 		switch(measurement) {
@@ -43,5 +47,10 @@ public class Vector {
 			break;
 		}
 		return dist;
+	}
+	
+	@Override
+	public Object clone() {
+		return new Vector(components);
 	}
 }
