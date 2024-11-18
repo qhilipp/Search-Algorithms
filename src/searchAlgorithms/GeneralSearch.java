@@ -37,13 +37,6 @@ public class GeneralSearch<Node> {
 				newPath.add(neighbor);
 				
 				strategy.add(new NodePath(neighbor, newPath));
-//				System.out.println(strategy);
-//				try {
-//					Thread.sleep(1000);
-//				} catch (InterruptedException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
 			}
 		}
 		
