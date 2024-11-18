@@ -1,5 +1,5 @@
 import searchAlgorithms.GeneralSearch;
-import searchStrategie.Stack;
+import searchStrategie.Uniform;
 import stateSpace.Cartesian;
 import stateSpace.Graph;
 import util.Vector;
@@ -22,7 +22,7 @@ public class Main {
 		graph.connect("E", "G", 2);
 		graph.connect("F", "G", 1);
 		graph.setGoal("G");
-		GeneralSearch<String> search = new GeneralSearch(graph, Stack.class);
+		GeneralSearch<String> search = new GeneralSearch(graph, Uniform.class);
 		for(String v : search.search()) {
 			System.out.println(v + " ");
 		}
