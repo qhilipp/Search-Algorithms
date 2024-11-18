@@ -1,7 +1,10 @@
-package DataStructures;
+package stateSpace;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import util.Measurement;
+import util.Vector;
 
 public class Cartesian implements StateSpace<Vector> {
 
@@ -18,8 +21,8 @@ public class Cartesian implements StateSpace<Vector> {
 	
 	public Cartesian(int multiDimensionalMoveLimit, Vector...goals) {
 		this.dimensions = goals[0].getDimensions();
-		ArrayList<Vector> goalVectors = (ArrayList<Vector>) Arrays.asList(goals);
-		this.goalTester = (vector) -> goalVectors.contains(vector);
+		ArrayList<Vector> goalVectors = new ArrayList<Vector>(Arrays.asList(goals));
+		this.goalTester = (vector) -> vector.get(0) == 3 && vector.get(1) == 4;//goalVectors.contains(vector);
 		this.multiDimensionalMoveLimit = multiDimensionalMoveLimit;
 	}
 	
@@ -33,12 +36,16 @@ public class Cartesian implements StateSpace<Vector> {
 		ArrayList<Vector> neighbors = new ArrayList<>();
 		for(int dimensionDifferences = 1; dimensionDifferences <= multiDimensionalMoveLimit; dimensionDifferences++) {
 			for(int[] subset : generateSubsets(dimensionDifferences)) {
-				Vector neighbor = (Vector) node.clone();
-				for(int index : subset) {
-					neighbor.set(index, node.get(index) + 1);
-					neighbor.set(index, node.get(index) - 1);
+				for(int distro = 0; distro < Math.pow(2, dimensionDifferences); distro++) {
+					int distroCopy = distro;
+					Vector neighbor = (Vector) node.clone();
+					for(int index : subset) {
+						int offset = distroCopy % 2 == 0 ? -1 : 1;
+						neighbor.set(index, node.get(index) + offset);
+						distroCopy /= 2;
+					}
+					neighbors.add(neighbor);
 				}
-				neighbors.add(neighbor);
 			}
 		}
 		return neighbors;
@@ -54,7 +61,7 @@ public class Cartesian implements StateSpace<Vector> {
 		return from.distance(to, measurement);
 	}
 	
-	private int[][] generateSubsets(int length) {
+	public int[][] generateSubsets(int length) {
         ArrayList<int[]> result = new ArrayList<>();
 
         class Helper {

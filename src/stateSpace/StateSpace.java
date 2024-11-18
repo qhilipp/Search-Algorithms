@@ -1,4 +1,4 @@
-package DataStructures;
+package stateSpace;
 
 import java.util.ArrayList;
 

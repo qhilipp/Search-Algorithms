@@ -1,4 +1,4 @@
-package DataStructures;
+package util;
 
 public class Vector {
 	private double[] components;
@@ -65,5 +65,12 @@ public class Vector {
 			if(get(i) != other.get(i)) return false;
 		}
 		return true;
+	}
+	
+	@Override
+	public String toString() {
+		String[] components = new String[this.components.length];
+		for(int i = 0; i < components.length; i++) components[i] = this.components[i] + "";
+		return "(" + String.join(", ", components) + ")";
 	}
 }
