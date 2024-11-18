@@ -1,6 +1,7 @@
 package heuristic;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import util.Measurement;
 import util.Vector;
@@ -9,6 +10,10 @@ public class DistanceHeuristic implements Heuristic<Vector> {
 
 	private Measurement measurement = Measurement.EUCLIDEAN;
 	private ArrayList<Vector> goals;
+	
+	public DistanceHeuristic(Vector...goals) {
+		this.goals = new ArrayList<>(Arrays.asList(goals));
+	}
 	
 	public DistanceHeuristic(ArrayList<Vector> goals) {
 		this.goals = goals;

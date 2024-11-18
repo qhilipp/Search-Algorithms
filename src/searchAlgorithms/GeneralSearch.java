@@ -44,7 +44,7 @@ public class GeneralSearch<Node> {
 	}
 	
 	private double rate(ArrayList<Node> path) {
-		return pastCost(path) + futureCost(path.getLast());
+		return pastCost(path) + space.futureCost(path.getLast());
 	}
 	
 	private double pastCost(ArrayList<Node> path) {
@@ -54,9 +54,4 @@ public class GeneralSearch<Node> {
 		}
 		return cost;
 	}
-	
-	private double futureCost(Node node) {
-		return 0;
-	}
-	
 }
