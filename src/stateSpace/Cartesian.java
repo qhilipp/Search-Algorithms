@@ -1,8 +1,9 @@
 package stateSpace;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
+import goalTest.GoalTester;
+import heuristic.Heuristic;
 import util.Measurement;
 import util.Vector;
 
@@ -10,20 +11,15 @@ public class Cartesian implements StateSpace<Vector> {
 
 	private final int dimensions;
 	private final int multiDimensionalMoveLimit;
-	private final GoalTester goalTester;
+	private final GoalTester<Vector> goalTester;
+	private final Heuristic<Vector> heuristic;
 	private final Measurement measurement = Measurement.EUCLIDEAN;
 	
-	public Cartesian(int dimensions, int multiDimensionalMoveLimit, GoalTester goalTester) {
+	public Cartesian(int dimensions, int multiDimensionalMoveLimit, Heuristic<Vector> heuristic, GoalTester<Vector> goalTester) {
 		this.dimensions = dimensions;
 		this.multiDimensionalMoveLimit = multiDimensionalMoveLimit;
+		this.heuristic = heuristic;
 		this.goalTester = goalTester;
-	}
-	
-	public Cartesian(int multiDimensionalMoveLimit, Vector...goals) {
-		this.dimensions = goals[0].getDimensions();
-		ArrayList<Vector> goalVectors = new ArrayList<Vector>(Arrays.asList(goals));
-		this.goalTester = (vector) -> vector.get(0) == 3 && vector.get(1) == 4;//goalVectors.contains(vector);
-		this.multiDimensionalMoveLimit = multiDimensionalMoveLimit;
 	}
 	
 	@Override
@@ -53,7 +49,7 @@ public class Cartesian implements StateSpace<Vector> {
 
 	@Override
 	public boolean isGoal(Vector node) {
-		return goalTester.test(node);
+		return goalTester.isGoal(node);
 	}
 
 	@Override
@@ -83,9 +79,9 @@ public class Cartesian implements StateSpace<Vector> {
         return result.toArray(new int[0][]);
     }
 
-	@FunctionalInterface
-	public interface GoalTester {
-		public boolean test(Vector vector);
+	@Override
+	public double futureCost(Vector node) {
+		return heuristic.futureCost(node);
 	}
 	
 }
