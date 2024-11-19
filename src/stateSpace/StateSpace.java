@@ -7,8 +7,8 @@ import heuristic.Heuristic;
 
 public abstract class StateSpace<Node> {
 	
-	private Heuristic<Node> heuristic;
-	private GoalTester<Node> goalTester;
+	protected Heuristic<Node> heuristic;
+	protected GoalTester<Node> goalTester;
 	
 	public StateSpace(Heuristic<Node> heuristic, GoalTester<Node> goalTester) {
 		this.heuristic = heuristic;

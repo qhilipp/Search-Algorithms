@@ -15,6 +15,14 @@ public class ListGoalTester<Node> implements GoalTester<Node> {
 		this.goals = goals;
 	}
 	
+	public void add(Node goal) {
+		goals.add(goal);
+	}
+	
+	public void remove(Node goal) {
+		goals.remove(goal);
+	}
+	
 	@Override
 	public boolean isGoal(Node node) {
 		for(Node goal : goals) {

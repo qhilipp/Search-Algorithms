@@ -8,19 +8,15 @@ import stateSpace.StateSpace;
 public class GeneralSearch<Node> {
 
 	private final StateSpace<Node> space;
-	private final Class<SearchStrategy<ArrayList<Node>>> strategy;
+	private final SearchStrategy<ArrayList<Node>> strategy;
 	
-	public GeneralSearch(StateSpace<Node> space, Class<SearchStrategy<ArrayList<Node>>> strategy) {
+	public GeneralSearch(StateSpace<Node> space, SearchStrategy<ArrayList<Node>> strategy) {
 		this.space = space;
 		this.strategy = strategy;
 	}
 	
 	public ArrayList<Node> search() {
-		SearchStrategy<ArrayList<Node>> strategy = null;
-		
-		try {
-			strategy = this.strategy.newInstance();
-		} catch(Exception e) {}
+		strategy.clear();
 		
 		ArrayList<Node> startPath = new ArrayList<>();
 		startPath.add(space.getStart());

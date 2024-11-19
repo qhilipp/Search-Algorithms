@@ -20,6 +20,10 @@ public abstract class SearchStrategy<Node> {
 		return list.isEmpty();
 	}
 	
+	public void clear() {
+		list.clear();
+	}
+	
 	protected void insert(Node node, double rating, int index) {
 		list.add(index < 0 ? list.size() + index + 1 : index, new NodeRating(node, rating));
 	}

@@ -3,43 +3,50 @@ package stateSpace;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Graph<Content> implements StateSpace<Content> {
+import goalTest.ListGoalTester;
+import heuristic.Heuristic;
 
-	private Content start;
-	private HashMap<Content, Boolean> goalMap = new HashMap<>();
-	private HashMap<Content, ArrayList<Edge>> edges = new HashMap<>();
+public class Graph<Node> extends StateSpace<Node> {
+
+	private Node start;
+	private HashMap<Node, ArrayList<Edge>> edges = new HashMap<>();
 	
-	public Graph(Content start, Content...nodes) {
-		for(Content node : nodes) {
+	public Graph(Heuristic<Node> heuristic, Node start, Node...nodes) {
+		super(heuristic, new ListGoalTester<Node>());
+		for(Node node : nodes) {
 			edges.put(node, new ArrayList<>());
 		}
 		this.start = start;
 		edges.put(start, new ArrayList<>());
 	}
 	
-	public void connect(Content from, Content to, double weight) {
+	public void connect(Node from, Node to, double weight) {
 		ArrayList<Edge> neighbors = edges.get(from);
 		if(neighbors == null) neighbors = new ArrayList<>();
 		neighbors.add(new Edge(to, weight));
 		edges.put(from, neighbors);
 	}
 	
-	public void setGoal(Content node) {
+	public void setGoal(Node node) {
 		setGoal(node, true);
 	}
 	
-	public void setGoal(Content node, boolean value) {
-		goalMap.put(node, value);
+	public void setGoal(Node node, boolean value) {
+		if(value) {
+			((ListGoalTester<Node>) this.goalTester).add(node);
+		} else {
+			((ListGoalTester<Node>) this.goalTester).remove(node);
+		}
 	}
 	
 	@Override
-	public Content getStart() {
+	public Node getStart() {
 		return start;
 	}
 
 	@Override
-	public ArrayList<Content> getNeighbors(Content node) {
-		ArrayList<Content> nodes = new ArrayList<>();
+	public ArrayList<Node> getNeighbors(Node node) {
+		ArrayList<Node> nodes = new ArrayList<>();
 		for(Edge edge : edges.get(node)) {
 			nodes.add(edge.to);
 		}
@@ -47,12 +54,7 @@ public class Graph<Content> implements StateSpace<Content> {
 	}
 
 	@Override
-	public boolean isGoal(Content node) {
-		return goalMap.containsKey(node) ? goalMap.get(node) : false;
-	}
-
-	@Override
-	public double getCost(Content from, Content to) {
+	public double getCost(Node from, Node to) {
 		for(Edge edge : edges.get(from)) {
 			if(edge.to.equals(to)) return edge.weight;
 		}
@@ -60,10 +62,10 @@ public class Graph<Content> implements StateSpace<Content> {
 	}
 	
 	class Edge {
-		Content to;
+		Node to;
 		double weight;
 		
-		Edge(Content to, double weight) {
+		Edge(Node to, double weight) {
 			this.to = to;
 			this.weight = weight;
 		}
