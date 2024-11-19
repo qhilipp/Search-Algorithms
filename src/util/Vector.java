@@ -1,6 +1,6 @@
 package util;
 
-public class Vector {
+public class Vector implements Position {
 	private double[] components;
 	
 	public Vector(int dimensions) {
@@ -47,6 +47,11 @@ public class Vector {
 			break;
 		}
 		return dist;
+	}
+	
+	@Override
+	public Vector getPosition() {
+		return this;
 	}
 	
 	@Override

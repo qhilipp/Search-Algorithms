@@ -6,39 +6,39 @@ import java.util.Arrays;
 import goalTest.ListGoalTester;
 import stateSpace.StateSpace;
 import util.Measurement;
-import util.Vector;
+import util.Position;
 
-public class DistanceHeuristic implements Heuristic<Vector> {
+public class DistanceHeuristic<P extends Position> implements Heuristic<P> {
 
 	private Measurement measurement = Measurement.EUCLIDEAN;
-	private ArrayList<Vector> goals;
+	private ArrayList<P> goals;
 	
-	public DistanceHeuristic(Vector...goals) {
+	public DistanceHeuristic(P...goals) {
 		this.goals = new ArrayList<>(Arrays.asList(goals));
 	}
 	
-	public DistanceHeuristic(ArrayList<Vector> goals) {
+	public DistanceHeuristic(ArrayList<P> goals) {
 		this.goals = goals;
 	}
 	
-	public DistanceHeuristic(Measurement measurement, ArrayList<Vector> goals) {
+	public DistanceHeuristic(Measurement measurement, ArrayList<P> goals) {
 		this.measurement = measurement;
 		this.goals = goals;
 	}
 	
 	@Override
-	public double futureCost(StateSpace<Vector> space, Vector node) {
+	public double futureCost(StateSpace<P> space, P node) {
 		double minDistance = Double.MAX_VALUE;
 		if(goals.isEmpty()) {
 			findGoals(space);
 		}
-		for(Vector goal : goals) minDistance = Math.min(minDistance, node.distance(goal, measurement));
+		for(P goal : goals) minDistance = Math.min(minDistance, node.getPosition().distance(goal.getPosition(), measurement));
 		return minDistance;
 	}
 	
-	private void findGoals(StateSpace<Vector> space) {
+	private void findGoals(StateSpace<P> space) {
 		if(space.getGoalTester() instanceof ListGoalTester) {
-			goals = ((ListGoalTester<Vector>) space.getGoalTester()).getGoals();
+			goals = ((ListGoalTester<P>) space.getGoalTester()).getGoals();
 		} else {
 			// TODO: Find goals in space
 		}
