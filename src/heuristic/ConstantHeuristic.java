@@ -1,5 +1,7 @@
 package heuristic;
 
+import stateSpace.StateSpace;
+
 public class ConstantHeuristic<Node> implements Heuristic<Node> {
 
 	double constant = 0;
@@ -11,7 +13,7 @@ public class ConstantHeuristic<Node> implements Heuristic<Node> {
 	}
 	
 	@Override
-	public double futureCost(Node node) {
+	public double futureCost(StateSpace<Node> space, Node node) {
 		return constant;
 	}
 

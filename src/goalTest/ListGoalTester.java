@@ -23,6 +23,10 @@ public class ListGoalTester<Node> implements GoalTester<Node> {
 		goals.remove(goal);
 	}
 	
+	public ArrayList<Node> getGoals() {
+		return goals;
+	}
+	
 	@Override
 	public boolean isGoal(Node node) {
 		for(Node goal : goals) {

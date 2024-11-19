@@ -11,8 +11,8 @@ public class Graph<Node> extends StateSpace<Node> {
 	private Node start;
 	private HashMap<Node, ArrayList<Edge>> edges = new HashMap<>();
 	
-	public Graph(Heuristic<Node> heuristic, Node start, Node...nodes) {
-		super(heuristic, new ListGoalTester<Node>());
+	public Graph(Node start, Node...nodes) {
+		super(new ListGoalTester<>());
 		for(Node node : nodes) {
 			edges.put(node, new ArrayList<>());
 		}
@@ -33,9 +33,9 @@ public class Graph<Node> extends StateSpace<Node> {
 	
 	public void setGoal(Node node, boolean value) {
 		if(value) {
-			((ListGoalTester<Node>) this.goalTester).add(node);
+			((ListGoalTester<Node>) getGoalTester()).add(node);
 		} else {
-			((ListGoalTester<Node>) this.goalTester).remove(node);
+			((ListGoalTester<Node>) getGoalTester()).remove(node);
 		}
 	}
 	

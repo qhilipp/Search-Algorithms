@@ -3,7 +3,6 @@ package stateSpace;
 import java.util.ArrayList;
 
 import goalTest.GoalTester;
-import heuristic.Heuristic;
 import util.Measurement;
 import util.Vector;
 
@@ -13,8 +12,8 @@ public class Cartesian extends StateSpace<Vector> {
 	private final int multiDimensionalMoveLimit;
 	private final Measurement measurement = Measurement.EUCLIDEAN;
 	
-	public Cartesian(int dimensions, int multiDimensionalMoveLimit, Heuristic<Vector> heuristic, GoalTester<Vector> goalTester) {
-		super(heuristic, goalTester);
+	public Cartesian(int dimensions, int multiDimensionalMoveLimit, GoalTester<Vector> goalTester) {
+		super(goalTester);
 		this.dimensions = dimensions;
 		this.multiDimensionalMoveLimit = multiDimensionalMoveLimit;
 	}

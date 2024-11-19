@@ -2,17 +2,20 @@ package searchAlgorithms;
 
 import java.util.ArrayList;
 
+import heuristic.Heuristic;
 import searchStrategie.SearchStrategy;
 import stateSpace.StateSpace;
 
 public class GeneralSearch<Node> {
 
-	private final StateSpace<Node> space;
-	private final SearchStrategy<ArrayList<Node>> strategy;
+	private StateSpace<Node> space;
+	private SearchStrategy<ArrayList<Node>> strategy;
+	private Heuristic<Node> heuristic;
 	
-	public GeneralSearch(StateSpace<Node> space, SearchStrategy<ArrayList<Node>> strategy) {
+	public GeneralSearch(StateSpace<Node> space, SearchStrategy<ArrayList<Node>> strategy, Heuristic<Node> heuristic) {
 		this.space = space;
 		this.strategy = strategy;
+		this.heuristic = heuristic;
 	}
 	
 	public ArrayList<Node> search() {
@@ -40,7 +43,7 @@ public class GeneralSearch<Node> {
 	}
 	
 	private double rate(ArrayList<Node> path) {
-		return pastCost(path) + space.futureCost(path.getLast());
+		return pastCost(path) + heuristic.futureCost(space, path.getLast());
 	}
 	
 	private double pastCost(ArrayList<Node> path) {
