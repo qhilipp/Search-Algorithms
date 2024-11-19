@@ -3,6 +3,7 @@ package searchAlgorithms;
 import java.util.ArrayList;
 
 import heuristic.Heuristic;
+import pathEvaluation.PathEvaluator;
 import searchStrategy.SearchStrategy;
 import stateSpace.StateSpace;
 
@@ -10,11 +11,13 @@ public class GeneralSearch<Node> {
 
 	private StateSpace<Node> space;
 	private SearchStrategy<ArrayList<Node>> strategy;
+	private PathEvaluator<Node> pathEvaluator;
 	private Heuristic<Node> heuristic;
 	
-	public GeneralSearch(StateSpace<Node> space, SearchStrategy<ArrayList<Node>> strategy, Heuristic<Node> heuristic) {
+	public GeneralSearch(StateSpace<Node> space, SearchStrategy<ArrayList<Node>> strategy, PathEvaluator<Node> pathEvaluator, Heuristic<Node> heuristic) {
 		this.space = space;
 		this.strategy = strategy;
+		this.pathEvaluator = pathEvaluator;
 		this.heuristic = heuristic;
 	}
 	
@@ -37,20 +40,15 @@ public class GeneralSearch<Node> {
 				
 				strategy.add(newPath, rate(newPath));
 			}
+			for(Node node : strategy.get()) {
+				System.out.println(node);
+			}
 		}
 		
 		return null;
 	}
 	
 	private double rate(ArrayList<Node> path) {
-		return pastCost(path) + heuristic.futureCost(space, path.getLast());
-	}
-	
-	private double pastCost(ArrayList<Node> path) {
-		double cost = 0;
-		for(int i = 0; i < path.size() - 1; i++) {
-			cost += space.getCost(path.get(i), path.get(i + 1));
-		}
-		return cost;
+		return pathEvaluator.pastCost(space, path) + heuristic.futureCost(space, path.getLast());
 	}
 }
