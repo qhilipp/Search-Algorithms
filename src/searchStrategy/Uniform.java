@@ -1,4 +1,4 @@
-package searchStrategie;
+package searchStrategy;
 
 public class Uniform<Node> extends SearchStrategy<Node> {
 

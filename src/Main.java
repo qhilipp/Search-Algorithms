@@ -1,5 +1,5 @@
 import goalTest.ListGoalTester;
-import searchAlgorithms.DepthFirstSearch;
+import searchAlgorithms.UniformSearch;
 import stateSpace.Cartesian;
 import util.Vector;
 
@@ -7,7 +7,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		Vector[] goals = { new Vector(3, 4) };
-		Cartesian space = new Cartesian(2, 1, new ListGoalTester<>(goals));
+		Cartesian space = new Cartesian(2, 2, new ListGoalTester<>(goals));
 //		Graph<String> graph = new Graph<String>("S", "A", "B", "C", "D", "E", "F", "G");
 //		graph.connect("S", "A", 6);
 //		graph.connect("S", "B", 2);
@@ -22,7 +22,7 @@ public class Main {
 //		graph.connect("E", "G", 2);
 //		graph.connect("F", "G", 1);
 //		graph.setGoal("G");
-		DepthFirstSearch<Vector> search = new DepthFirstSearch<>(space);
+		UniformSearch<Vector> search = new UniformSearch<>(space);
 		for(Vector v : search.search()) {
 			System.out.println(v + " ");
 		}

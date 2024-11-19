@@ -1,7 +1,7 @@
 package searchAlgorithms;
 
 import heuristic.ConstantHeuristic;
-import searchStrategie.DepthFirst;
+import searchStrategy.DepthFirst;
 import stateSpace.StateSpace;
 
 public class DepthFirstSearch<Node> extends GeneralSearch<Node> {

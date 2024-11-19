@@ -1,4 +1,4 @@
-package searchStrategie;
+package searchStrategy;
 
 public class BreadthFirst<Node> extends SearchStrategy<Node> {
 	

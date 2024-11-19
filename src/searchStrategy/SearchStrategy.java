@@ -1,4 +1,4 @@
-package searchStrategie;
+package searchStrategy;
 
 import java.util.ArrayList;
 

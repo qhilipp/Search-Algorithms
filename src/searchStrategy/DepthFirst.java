@@ -1,4 +1,4 @@
-package searchStrategie;
+package searchStrategy;
 
 public class DepthFirst<Node> extends SearchStrategy<Node> {
 

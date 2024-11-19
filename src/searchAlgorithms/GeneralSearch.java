@@ -3,7 +3,7 @@ package searchAlgorithms;
 import java.util.ArrayList;
 
 import heuristic.Heuristic;
-import searchStrategie.SearchStrategy;
+import searchStrategy.SearchStrategy;
 import stateSpace.StateSpace;
 
 public class GeneralSearch<Node> {
