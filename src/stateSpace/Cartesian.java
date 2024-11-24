@@ -1,6 +1,7 @@
 package stateSpace;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import goalTest.GoalTester;
 import util.Measurement;
@@ -8,8 +9,37 @@ import util.Vector;
 
 public class Cartesian extends StateSpace<Vector> {
 
-	private final int multiDimensionalMoveLimit;
-	private final Measurement measurement = Measurement.EUCLIDEAN;
+	private int multiDimensionalMoveLimit;
+	private Measurement measurement = Measurement.EUCLIDEAN;
+	private HashMap<Vector, Boolean> map = new HashMap<>();
+	
+	public Cartesian(Vector start, int multiDimensionalMoveLimit, GoalTester<Vector> goalTester, boolean[][][] map) {
+		super(start, goalTester);
+		this.multiDimensionalMoveLimit = multiDimensionalMoveLimit;
+		for(int x = 0; x < map.length; x++) {
+			for(int y = 0; y < map[0].length; y++) {
+				for(int z = 0; z < map[0][0].length; z++) {
+					this.map.put(new Vector(x, y, z), map[x][y][z]);
+				}
+			}
+		}
+	}
+	
+	public Cartesian(Vector start, int multiDimensionalMoveLimit, GoalTester<Vector> goalTester, boolean[][] map) {
+		super(start, goalTester);
+		this.multiDimensionalMoveLimit = multiDimensionalMoveLimit;
+		for(int x = 0; x < map.length; x++) {
+			for(int y = 0; y < map[0].length; y++) {
+				this.map.put(new Vector(x, y), map[x][y]);
+			}
+		}
+	}
+	
+	public Cartesian(Vector start, int multiDimensionalMoveLimit, GoalTester<Vector> goalTester, HashMap<Vector, Boolean> map) {
+		super(start, goalTester);
+		this.multiDimensionalMoveLimit = multiDimensionalMoveLimit;
+		this.map = map;
+	}
 	
 	public Cartesian(Vector start, int multiDimensionalMoveLimit, GoalTester<Vector> goalTester) {
 		super(start, goalTester);
@@ -29,7 +59,7 @@ public class Cartesian extends StateSpace<Vector> {
 						neighbor.set(index, node.get(index) + offset);
 						distroCopy /= 2;
 					}
-					neighbors.add(neighbor);
+					if(!map.containsKey(neighbor) || map.get(neighbor)) neighbors.add(neighbor);
 				}
 			}
 		}
