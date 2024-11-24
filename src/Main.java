@@ -1,5 +1,6 @@
 import searchAlgorithms.AStarSearch;
 import stateSpace.Graph;
+import stateSpace.StateSpace;
 import util.Point;
 import util.Vector;
 
@@ -26,14 +27,28 @@ public class Main {
 		space.connect(b, e, 6);
 		space.connect(c, b, 3);
 		space.connect(c, e, 6);
+		space.connect(c, f, 4);
 		space.connect(d, f, 5);
 		space.connect(e, g, 2);
 		space.connect(f, g, 1);
 		space.setGoal(g);
-		AStarSearch<Point> search = new AStarSearch<>(space);
-		for(Object o : search.search()) {
-			System.out.println(o + " ");
-		}
+		AStarSearch<Point> search = new AStarSearch<>(space, 
+				(StateSpace<Point> stateSpace, Point node) -> {
+					if(node.equals(s)) return 6;
+					if(node.equals(a)) return 8;
+					if(node.equals(b)) return 6;
+					if(node.equals(c)) return 5;
+					if(node.equals(d)) return 4;
+					if(node.equals(e)) return 2;
+					if(node.equals(f)) return 1;
+					return 0;
+				}
+		);
+//		AStarSearch<Point> search = new AStarSearch<>(space);
+		System.out.println(search.isHeuristicAdmissible());
+//		for(Object o : search.search()) {
+//			System.out.print(o + " -> ");
+//		}
 	}
 
 }

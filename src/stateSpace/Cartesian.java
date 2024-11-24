@@ -8,19 +8,12 @@ import util.Vector;
 
 public class Cartesian extends StateSpace<Vector> {
 
-	private final int dimensions;
 	private final int multiDimensionalMoveLimit;
 	private final Measurement measurement = Measurement.EUCLIDEAN;
 	
-	public Cartesian(int dimensions, int multiDimensionalMoveLimit, GoalTester<Vector> goalTester) {
-		super(goalTester);
-		this.dimensions = dimensions;
+	public Cartesian(Vector start, int multiDimensionalMoveLimit, GoalTester<Vector> goalTester) {
+		super(start, goalTester);
 		this.multiDimensionalMoveLimit = multiDimensionalMoveLimit;
-	}
-	
-	@Override
-	public Vector getStart() {
-		return new Vector(this.dimensions);
 	}
 
 	@Override
@@ -48,6 +41,10 @@ public class Cartesian extends StateSpace<Vector> {
 		return from.distance(to, measurement);
 	}
 	
+	public int getDimensions() {
+		return getStart().getDimensions();
+	}
+	
 	public int[][] generateSubsets(int length) {
         ArrayList<int[]> result = new ArrayList<>();
 
@@ -58,7 +55,7 @@ public class Cartesian extends StateSpace<Vector> {
                     return;
                 }
 
-                for(int i = start; i < dimensions; i++) {
+                for(int i = start; i < getDimensions(); i++) {
                     current[index] = i;
                     generateCombinations(i + 1, current, index + 1);
                 }

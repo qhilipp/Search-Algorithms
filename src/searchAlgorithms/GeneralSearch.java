@@ -40,9 +40,6 @@ public class GeneralSearch<Node> {
 				
 				strategy.add(newPath, rate(newPath));
 			}
-			for(Node node : strategy.get()) {
-				System.out.println(node);
-			}
 		}
 		
 		return null;
@@ -50,5 +47,23 @@ public class GeneralSearch<Node> {
 	
 	private double rate(ArrayList<Node> path) {
 		return pathEvaluator.pastCost(space, path) + heuristic.futureCost(space, path.getLast());
+	}
+	
+	public boolean isHeuristicAdmissible() {
+		ArrayList<Node> nodes = space.getNodes();
+		Node initialStart = space.getStart();
+		UniformSearch<Node> search = new UniformSearch<>(space);
+		ArrayList<Node> path = null;
+		for(Node node : nodes) {
+			double heuristicCost = heuristic.futureCost(space, node);
+			space.setStart(node);
+			path = search.search();
+			double actualCost = 0;
+			for(int i = 0; i < path.size() - 1; i++) actualCost += space.getCost(path.get(i), path.get(i + 1));
+			System.out.println(node.toString() + "\t" + heuristicCost + "\t" + actualCost);
+			if(actualCost < heuristicCost) return false;
+		}
+		space.setStart(initialStart);
+		return true;
 	}
 }

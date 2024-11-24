@@ -8,15 +8,13 @@ import heuristic.Heuristic;
 
 public class Graph<Node> extends StateSpace<Node> {
 
-	private Node start;
 	private HashMap<Node, ArrayList<Edge>> edges = new HashMap<>();
 	
 	public Graph(Node start, Node...nodes) {
-		super(new ListGoalTester<>());
+		super(start, new ListGoalTester<>());
 		for(Node node : nodes) {
 			edges.put(node, new ArrayList<>());
 		}
-		this.start = start;
 		edges.put(start, new ArrayList<>());
 	}
 	
@@ -37,11 +35,6 @@ public class Graph<Node> extends StateSpace<Node> {
 		} else {
 			((ListGoalTester<Node>) getGoalTester()).remove(node);
 		}
-	}
-	
-	@Override
-	public Node getStart() {
-		return start;
 	}
 
 	@Override
