@@ -96,4 +96,36 @@ public class Cartesian extends StateSpace<Vector> {
 
         return result.toArray(new int[0][]);
     }
+	
+	public int getMultiDimensionalMoveLimit() {
+		return multiDimensionalMoveLimit;
+	}
+	
+	public void setMultiDimensionalMoveLimit(int multiDimensionalMoveLimit) {
+		this.multiDimensionalMoveLimit = multiDimensionalMoveLimit;
+	}
+	
+	public Measurement getMeasurement() {
+		return measurement;
+	}
+	
+	public void setMeasurement(Measurement measurement) {
+		this.measurement = measurement;
+	}
+	
+	public boolean getMap(Vector node) {
+		return map.get(node);
+	}
+	
+	public boolean getMap(double...components) {
+		return map.get(new Vector(components));
+	}
+	
+	public void setMap(boolean value, Vector node) {
+		map.put(node, value);
+	}
+	
+	public void setMap(boolean value, double...components) {
+		map.put(new Vector(components), value);
+	}
 }
