@@ -30,7 +30,7 @@ public class Cartesian extends StateSpace<Vector> {
 		this.multiDimensionalMoveLimit = multiDimensionalMoveLimit;
 		for(int x = 0; x < map.length; x++) {
 			for(int y = 0; y < map[0].length; y++) {
-				this.map.put(new Vector(x, y), map[x][y]);
+				this.map.put(new Vector(y, x), map[x][y]);
 			}
 		}
 	}

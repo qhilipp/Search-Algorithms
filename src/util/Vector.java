@@ -1,5 +1,7 @@
 package util;
 
+import java.util.Arrays;
+
 public class Vector implements Position {
 	private double[] components;
 	
@@ -77,5 +79,10 @@ public class Vector implements Position {
 		String[] components = new String[this.components.length];
 		for(int i = 0; i < components.length; i++) components[i] = this.components[i] + "";
 		return "(" + String.join(", ", components) + ")";
+	}
+	
+	@Override
+	public int hashCode() {
+		return Arrays.hashCode(components);
 	}
 }
