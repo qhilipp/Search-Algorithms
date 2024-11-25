@@ -50,7 +50,6 @@ public class GeneralSearch<Node> {
 				minCostToNode.put(neighbor, pathCost);
 				
 				strategy.add(newPath, rate(newPath));
-				System.out.println(newPath);
 			}
 		}
 		
