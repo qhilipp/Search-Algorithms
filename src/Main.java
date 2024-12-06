@@ -30,7 +30,7 @@ public class Main {
 		};
 		Cartesian space = new Cartesian(new Vector(3, 8), 2, new ListGoalTester<>(goals), map);
 		
-		return new AStarSearch<>(space).search();
+		return AStarSearch.autoHeuristic(space).search();
 	}
 	
 	static ArrayList<Point> searchGraphSpace() {
