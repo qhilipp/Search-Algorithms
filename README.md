@@ -28,12 +28,12 @@ All included Search Algorithms rely on the GeneralSearch algorithm. This algorit
 5. repeats those steps until the first node is discovered that according to the [GoalTester](#goalTester-) is a goal node
 
 ## Included Search Algorithms 💠
-* GeneralSearch
-* A\*Search
-* UniformSearch
-* BreadthFirstSearch
-* DepthFirstSearch
-* BestFirstSearch
+* [GeneralSearch](src/searchAlgorithms/GeneralSearch.java)
+* [A\*Search](src/searchAlgorithms/AStarSearch.java)
+* [UniformSearch](src/searchAlgorithms/UniformSearch.java)
+* [BreadthFirstSearch](src/searchAlgorithms/BreadthFirstSearch.java)
+* [DepthFirstSearch](src/searchAlgorithms/DepthFirstSearch.java)
+* [BestFirstSearch](src/searchAlgorithms/BestFirstSearch.java)
 
 ## StateSpace 🗺️
 The repository also contains a couple of commonly used state spaces that the Search Algorithms use as their environments. Those are:
