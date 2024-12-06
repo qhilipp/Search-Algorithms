@@ -15,16 +15,17 @@ The repository contains multple packages, each usually containing one abstract c
 * [util](#utilities-)
 
 ## Try it out yourself 🧪
-The default package of this project contains the Main.java file, which contains the main method and a couple of methods for testing the algorithms. Feel free to play around in this file. If you want to create your own SearchAlgorithm, just open the [searchAlgorithms](src/searchAlgorithms) package, add a new generic class that inherits from [GeneralSearch](#generalSearch-) and implement a constructor that calls the super constructor. You can orient yourself to the other classes in the package. The same is true if you want to add your own [SearchStrategy](#-searchStrategy), [GoalTester](#-goalTest), etc.
+The default package of this project contains the Main.java file, which contains the main method and a couple of methods for testing the algorithms. Feel free to play around in this file. If you want to create your own SearchAlgorithm, just open the [searchAlgorithms](src/searchAlgorithms) package, add a new generic class that inherits from [GeneralSearch](#generalSearch-) and implement a constructor that calls the super constructor. You can orient yourself to the other classes in the package. The same is true if you want to add your own [SearchStrategy](#searchStrategy-), [GoalTester](#goalTest-), etc.
 
 ## GeneralSearch 🕵
 All included Search Algorithms rely on the GeneralSearch algorithm. This algorithm
 1. expands all neighbors of the current node
 2. evaluates their desirability by adding
-	* the future cost, aka. heuristic value (e.g., Euclidean distance to the closest goal)
-	* the past cost, aka. path value (e.g., ConstantPathEvaluator for BreadthFirstSearch)
-3. puts them into a SearchStrategy aka. data structure (e.g., Stack for DepthFirstSearch)
-4. ignores already visited nodes according to the LoopHandler (e.g., TreeLoopHandler for tree search, GraphLoopHandler for graph search)
+	* the future cost, aka. heuristic value using the [Heuristic](#heuristic-)
+	* the past cost, aka. path value using the [PathEvaluator](#pathEvaluator-)
+3. puts them into a [SearchStrategy](#searchStrategy-) aka. data structure (e.g., Stack for DepthFirstSearch)
+4. ignores already visited nodes according to the [LoopHandler](#loopHandler-)
+5. repeats those steps until the first node is discovered that according to the [GoalTester](#goalTester-) is a goal node
 
 ## Included Search Algorithms 💠
 * GeneralSearch
