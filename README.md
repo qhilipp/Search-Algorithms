@@ -4,15 +4,15 @@ This repository is a library containing search algorithms to find paths in State
 
 ## Structure
 The repository contains multple packages, each usually containing one abstract class or interface and some implementations of them. The packages are:
-* [(default package)](##Testing 🧪)
-* [searchAlgorithms](##Included Search Algorithms 💠)
-* [stateSpace](##StateSpace 🗺️)
-* [goalTest](##GoalTester 🎯)
-* [pathEvaluation](##PathEvaluator 🛣️)
-* [heuristic](##Heuristic 🤔)
-* [loopHandling](##LoopHandler 🔄)
-* [searchStrategy](##SearchStrategy 📚)
-* [util](##Utilities 🔨)
+* [(default package)](#testing-)
+* [searchAlgorithms](#included-search-algorithms-)
+* [stateSpace](#stateSpace-)
+* [goalTest](#goalTester-)
+* [pathEvaluation](#pathEvaluator-)
+* [heuristic](#heuristic-)
+* [loopHandling](#loopHandler-)
+* [searchStrategy](#searchStrategy-)
+* [util](#utilities-)
 
 ## Testing 🧪
 The default package of the project contains the Main.java file which contains the main method and a couple of methods for testing with the algorithms. Feel free to play around in this file.
