@@ -4,7 +4,7 @@ This repository is a library containing search algorithms to find paths in State
 
 ## Structure
 The repository contains multple packages, each usually containing one abstract class or interface and some implementations of them. The packages are:
-* [(default package)](#testing-)
+* [(default package)](#try-it-out-yourself-)
 * [searchAlgorithms](#included-search-algorithms-)
 * [stateSpace](#stateSpace-)
 * [goalTest](#goalTester-)
@@ -14,8 +14,8 @@ The repository contains multple packages, each usually containing one abstract c
 * [searchStrategy](#searchStrategy-)
 * [util](#utilities-)
 
-## Testing 🧪
-The default package of the project contains the Main.java file, which contains the main method and a couple of methods for testing the algorithms. Feel free to play around in this file.
+## Try it out yourself 🧪
+The default package of this project contains the Main.java file, which contains the main method and a couple of methods for testing the algorithms. Feel free to play around in this file. If you want to create your own SearchAlgorithm, just open the [searchAlgorithms](src/searchAlgorithms) package, add a new generic class that inherits from [GeneralSearch](#generalSearch-) and implement a constructor that calls the super constructor. You can orient yourself to the other classes in the package. The same is true if you want to add your own [SearchStrategy](#-searchStrategy), [GoalTester](#-goalTest), etc.
 
 ## GeneralSearch 🕵
 All included Search Algorithms rely on the GeneralSearch algorithm. This algorithm
