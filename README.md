@@ -21,8 +21,8 @@ The default package of this project contains the Main.java file, which contains 
 All included Search Algorithms rely on the GeneralSearch algorithm. This algorithm
 1. expands all neighbors of the current node
 2. evaluates their desirability by adding
-* the future cost, aka. heuristic value (e.g., Euclidean distance to the closest goal)
-* the past cost, aka. path value (e.g., ConstantPathEvaluator for BreadthFirstSearch)
+	* the future cost, aka. heuristic value (e.g., Euclidean distance to the closest goal)
+	* the past cost, aka. path value (e.g., ConstantPathEvaluator for BreadthFirstSearch)
 3. puts them into a SearchStrategy aka. data structure (e.g., Stack for DepthFirstSearch)
 4. ignores already visited nodes according to the LoopHandler (e.g., TreeLoopHandler for tree search, GraphLoopHandler for graph search)
 
