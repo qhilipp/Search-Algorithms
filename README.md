@@ -1,13 +1,28 @@
 # Search Algorithms
 
-This repository is a library containing search algorithms to find paths in State Spaces. It relies on [CS165A](https://sites.cs.ucsb.edu/~xyan/classes/CS165A-2024fall/syllabus.html) at UCSB.
+This repository is a library containing search algorithms to find paths in State Spaces. It relies on [CS165A](https://sites.cs.ucsb.edu/~xyan/classes/CS165A-2024fall/syllabus.html) at UCSB. It is ment to serve as a help to understanding the different search algorithms, how they work and to test them out on your own. You can also experiment and add more algorithms on your own.
+
+## Structure
+The repository contains multple packages, each usually containing one abstract class or interface and some implementations of them. The packages are:
+* [(default package)](##Testing 🧪)
+* [searchAlgorithms](##Included Search Algorithms 💠)
+* [stateSpace](##StateSpace 🗺️)
+* [goalTest](##GoalTester 🎯)
+* [pathEvaluation](##PathEvaluator 🛣️)
+* [heuristic](##Heuristic 🤔)
+* [loopHandling](##LoopHandler 🔄)
+* [searchStrategy](##SearchStrategy 📚)
+* [util](##Utilities 🔨)
+
+## Testing 🧪
+The default package of the project contains the Main.java file which contains the main method and a couple of methods for testing with the algorithms. Feel free to play around in this file.
 
 ## GeneralSearch 🕵
 All included Search Algorithms rely on the GeneralSearch algorithm. This algorithm
 1. expands all neighbors of the current node
 2. evaluates their desirability by adding
 * the future cost, aka. heuristic value (e.g., Euclidean distance to the closest goal)
-* the past cost, aka. path value (e.g., ConstantPathEvaluator for BreadthFirstSearch) 
+* the past cost, aka. path value (e.g., ConstantPathEvaluator for BreadthFirstSearch)
 3. puts them into a SearchStrategy aka. data structure (e.g., Stack for DepthFirstSearch)
 4. ignores already visited nodes according to the LoopHandler (e.g., TreeLoopHandler for tree search, GraphLoopHandler for graph search)
 
