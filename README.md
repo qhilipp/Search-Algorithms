@@ -15,7 +15,7 @@ The repository contains multple packages, each usually containing one abstract c
 * [util](#utilities-)
 
 ## Testing 🧪
-The default package of the project contains the Main.java file which contains the main method and a couple of methods for testing with the algorithms. Feel free to play around in this file.
+The default package of the project contains the Main.java file, which contains the main method and a couple of methods for testing the algorithms. Feel free to play around in this file.
 
 ## GeneralSearch 🕵
 All included Search Algorithms rely on the GeneralSearch algorithm. This algorithm
