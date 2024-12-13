@@ -1,27 +1,21 @@
 package util;
 
-public class NamedVector implements Position, Nameable {
+public class NamedVector extends Vector {
 
 	private String name = null;
-	private Vector position;
 	
 	public NamedVector(double...components) {
-		this.position = new Vector(components);
+		super(components);
 	}
 	
 	public NamedVector(String name, double...components) {
+		super(components);
 		this.name = name;
-		this.position = new Vector(components);
-	}
-	
-	@Override
-	public Vector getPosition() {
-		return position;
 	}
 	
 	@Override
 	public String getName() {
-		if(name == null) return position.toString();
+		if(name == null) return toString();
 		return name;
 	}
 	
@@ -40,8 +34,8 @@ public class NamedVector implements Position, Nameable {
 	}
 	
 	@Override
-	public String toString() {
-		return getName();
+	public Object cloneObject() {
+		return new NamedVector(name, components);
 	}
 	
 }
