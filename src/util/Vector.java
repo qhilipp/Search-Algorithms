@@ -2,7 +2,7 @@ package util;
 
 import java.util.Arrays;
 
-public class Vector implements Position {
+public class Vector implements Position, Nameable {
 	private double[] components;
 	
 	public Vector(int dimensions) {
@@ -51,10 +51,61 @@ public class Vector implements Position {
 		return dist;
 	}
 	
+	public void translate(double... components) {
+		translate(new Vector(components));
+	}
+	
+	public void translate(Vector delta) {
+		if(delta.getDimensions() != getDimensions()) return;
+		for(int i = 0; i < getDimensions(); i++) set(i, get(i) + delta.get(i));
+	}
+	
+	public Vector translated(double...components) {
+		return translated(new Vector(components));
+	}
+	
+	public Vector translated(Vector delta) {
+		Vector clone = (Vector) this.clone();
+		clone.translate(delta);
+		return clone;
+	}
+	
+	public void scale(double factor) {
+		for(int i = 0; i < getDimensions(); i++) set(i, get(i) * factor);
+	}
+	
+	public Vector scaled(double factor) {
+		Vector clone = (Vector) this.clone();
+		clone.scale(factor);
+		return clone;
+	}
+	
+	public double x() {
+		return get(0);
+	}
+	
+	public double y() {
+		return get(1);
+	}
+	
+	public double z() {
+		return get(2);
+	}
+	
 	@Override
 	public Vector getPosition() {
 		return this;
 	}
+	
+	@Override
+	public String getName() {
+		String[] components = new String[this.components.length];
+		for(int i = 0; i < components.length; i++) components[i] = (this.components[i] % 1 == 0) ? ((int) this.components[i] + "") : (this.components[i] + "");
+		return String.join(", ", components);
+	}
+	
+	@Override
+	public void setName(String name) {}
 	
 	@Override
 	public Object clone() {
@@ -85,4 +136,5 @@ public class Vector implements Position {
 	public int hashCode() {
 		return Arrays.hashCode(components);
 	}
+
 }
