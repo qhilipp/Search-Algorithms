@@ -1,5 +1,6 @@
 package ui;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -36,6 +37,7 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 	private SSVListener<Node> listener = null;
 	private int nodesOnScreen = 0;
 	private boolean showHeuristic = true;
+	private ArrayList<Node> path = new ArrayList<>();
 	
 	public StateSpaceView(StateSpace<Node> space) {
 		setSize(600, 600);
@@ -45,6 +47,7 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 		
 		setSpace(space);
 		searchAlgorithm = AStarSearch.autoHeuristic(space);
+		path = searchAlgorithm.search();
 	}
 	
 	@Override
@@ -60,26 +63,42 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 			
 			if(!isInBounds(node)) continue;
 
-			g.setColor(Color.WHITE);
+			Color fillColor = path.contains(node) ? Color.GREEN : Color.WHITE;
+			
+			g.setColor(fillColor);
 			g.fillOval((int) translatedOvalPosition.x(), (int) translatedOvalPosition.y(), getNodeSize(), getNodeSize());
-			g.setColor(Color.BLACK);
+						
 			
 			for(Node neighbor : space.getNeighbors(node)) {
+				boolean highlightArrow = arrowIsInPath(node, neighbor);
+				
 				Vector translatedNeighborCenter = spaceToPixel(neighbor.getPosition());
-				Vector neighborOffset = interpolate(translatedNeighborCenter, translatedOvalCenter, getNodeSize() / 2);
+				Vector neighborOffset = interpolate(translatedNeighborCenter, translatedOvalCenter, getNodeSize() * 0.75);
 				Vector nodeOffset = interpolate(translatedOvalCenter, translatedNeighborCenter, getNodeSize() / 2);
+
+				Vector[] triangleCorners = getTriangle(translatedOvalCenter, translatedNeighborCenter, highlightArrow ? 2 : 1);
+				
 				int[] xPos = new int[3];
 				int[] yPos = new int[3];
-				Vector[] triangleCorners = getTriangle(translatedOvalCenter, translatedNeighborCenter);
+				
 				xPos[0] = (int) triangleCorners[0].x();
 				yPos[0] = (int) triangleCorners[0].y();
 				xPos[1] = (int) triangleCorners[1].x();
 				yPos[1] = (int) triangleCorners[1].y();
 				xPos[2] = (int) triangleCorners[2].x();
 				yPos[2] = (int) triangleCorners[2].y();
+				
+				g.setColor(highlightArrow ? Color.GREEN : Color.BLACK);
+				g.setStroke(highlightArrow ? new BasicStroke(3) : new BasicStroke(1));
 				g.fillPolygon(xPos, yPos, xPos.length);
+				
+				if(arrowIsInPath(neighbor, node)) continue;
+				
 				g.drawLine((int) nodeOffset.x(), (int) nodeOffset.y(), (int) neighborOffset.x(), (int) neighborOffset.y());
 			}
+			
+			g.setColor(Color.BLACK);
+			g.setStroke(new BasicStroke(1));
 			
 			Vector nameSize = getStringSize(g, node.getName());
 			int nameYOffset = showHeuristic ? (int) (nameSize.y() / 2) : 0;
@@ -104,9 +123,16 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 		}
 	}
 	
-	private Vector[] getTriangle(Vector from, Vector to) {
-		double width = getNodeSize() / 10;
-		double height = getNodeSize() / 4;
+	private boolean arrowIsInPath(Node from, Node to) {
+		for(int i = 0; i < path.size() - 1; i++) {
+			if(path.get(i).equals(from) && path.get(i + 1).equals(to)) return true;
+		}
+		return false;
+	}
+	
+	private Vector[] getTriangle(Vector from, Vector to, double size) {
+		double width = getNodeSize() / 10 * size;
+		double height = getNodeSize() / 4 * size;
 		
 		Vector base = interpolate(to, from, height);
 		Vector direction = from.translated(to.scaled(-1));
