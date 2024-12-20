@@ -5,15 +5,18 @@ import java.util.HashMap;
 
 import goalTest.GoalTester;
 import util.Measurement;
+import util.Nameable;
+import util.Position;
 import util.Vector;
+import util.Copyable;
 
-public class Cartesian extends StateSpace<Vector> {
+public class Cartesian<Node extends Position&Nameable&Copyable> extends StateSpace<Node> {
 
 	private int multiDimensionalMoveLimit;
 	private Measurement measurement = Measurement.EUCLIDEAN;
 	private HashMap<Vector, Boolean> map = new HashMap<>();
 	
-	public Cartesian(Vector start, int multiDimensionalMoveLimit, GoalTester<Vector> goalTester, boolean[][][] map) {
+	public Cartesian(Node start, int multiDimensionalMoveLimit, GoalTester<Node> goalTester, boolean[][][] map) {
 		super(start, goalTester);
 		this.multiDimensionalMoveLimit = multiDimensionalMoveLimit;
 		for(int x = 0; x < map.length; x++) {
@@ -25,7 +28,7 @@ public class Cartesian extends StateSpace<Vector> {
 		}
 	}
 	
-	public Cartesian(Vector start, int multiDimensionalMoveLimit, GoalTester<Vector> goalTester, boolean[][] map) {
+	public Cartesian(Node start, int multiDimensionalMoveLimit, GoalTester<Node> goalTester, boolean[][] map) {
 		super(start, goalTester);
 		this.multiDimensionalMoveLimit = multiDimensionalMoveLimit;
 		for(int x = 0; x < map.length; x++) {
@@ -35,28 +38,28 @@ public class Cartesian extends StateSpace<Vector> {
 		}
 	}
 	
-	public Cartesian(Vector start, int multiDimensionalMoveLimit, GoalTester<Vector> goalTester, HashMap<Vector, Boolean> map) {
+	public Cartesian(Node start, int multiDimensionalMoveLimit, GoalTester<Node> goalTester, HashMap<Vector, Boolean> map) {
 		super(start, goalTester);
 		this.multiDimensionalMoveLimit = multiDimensionalMoveLimit;
 		this.map = map;
 	}
 	
-	public Cartesian(Vector start, int multiDimensionalMoveLimit, GoalTester<Vector> goalTester) {
+	public Cartesian(Node start, int multiDimensionalMoveLimit, GoalTester<Node> goalTester) {
 		super(start, goalTester);
 		this.multiDimensionalMoveLimit = multiDimensionalMoveLimit;
 	}
 
 	@Override
-	public ArrayList<Vector> getNeighbors(Vector node) {
-		ArrayList<Vector> neighbors = new ArrayList<>();
+	public ArrayList<Node> getNeighbors(Node node) {
+		ArrayList<Node> neighbors = new ArrayList<>();
 		for(int dimensionDifferences = 1; dimensionDifferences <= multiDimensionalMoveLimit; dimensionDifferences++) {
 			for(int[] subset : generateSubsets(dimensionDifferences)) {
 				for(int distro = 0; distro < Math.pow(2, dimensionDifferences); distro++) {
 					int distroCopy = distro;
-					Vector neighbor = (Vector) node.clone();
+					Node neighbor = (Node) node.copy();
 					for(int index : subset) {
 						int offset = distroCopy % 2 == 0 ? -1 : 1;
-						neighbor.set(index, node.get(index) + offset);
+						neighbor.getPosition().set(index, node.getPosition().get(index) + offset);
 						distroCopy /= 2;
 					}
 					if(!map.containsKey(neighbor) || map.get(neighbor)) neighbors.add(neighbor);
@@ -67,12 +70,12 @@ public class Cartesian extends StateSpace<Vector> {
 	}
 
 	@Override
-	public double getCost(Vector from, Vector to) {
-		return from.distance(to, measurement);
+	public double getCost(Node from, Node to) {
+		return from.getPosition().distance(to.getPosition(), measurement);
 	}
 	
 	public int getDimensions() {
-		return getStart().getDimensions();
+		return getStart().getPosition().getDimensions();
 	}
 	
 	public int[][] generateSubsets(int length) {
@@ -113,16 +116,16 @@ public class Cartesian extends StateSpace<Vector> {
 		this.measurement = measurement;
 	}
 	
-	public boolean getMap(Vector node) {
-		return map.get(node);
+	public boolean getMap(Vector position) {
+		return map.containsKey(position) && map.get(position);
 	}
 	
-	public boolean getMap(double...components) {
-		return map.get(new Vector(components));
+	public void toggleMap(Node node) {
+		map.put(node.getPosition(), !getMap(node.getPosition()));
 	}
 	
-	public void setMap(boolean value, Vector node) {
-		map.put(node, value);
+	public void setMap(boolean value, Node node) {
+		map.put(node.getPosition(), value);
 	}
 	
 	public void setMap(boolean value, double...components) {
