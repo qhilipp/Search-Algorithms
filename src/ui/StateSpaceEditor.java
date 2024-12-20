@@ -1,7 +1,9 @@
 package ui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,7 +29,7 @@ public class StateSpaceEditor<Node extends Position&Nameable&Copyable> extends J
     private JPanel neighborsList;
     private JScrollPane scrollPane;
     
-    private SSVListener<Node> listener;
+    private SSEListener<Node> listener;
 	
 	public StateSpaceEditor(StateSpace<Node> space) {
 		this.space = space;
@@ -53,9 +55,36 @@ public class StateSpaceEditor<Node extends Position&Nameable&Copyable> extends J
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         add(scrollPane);
         
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        buttonPanel.setBackground(Color.GRAY);
+
+        JButton saveButton = new JButton("Next step");
+        saveButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(listener != null) {
+					listener.nextIteration();
+				}
+			}
+        });
+        JButton cancelButton = new JButton("Search");
+        cancelButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(listener != null) {
+					listener.continueSearch();
+				}
+			}
+        });
+
+        buttonPanel.add(saveButton);
+        buttonPanel.add(cancelButton);
+
+        add(buttonPanel, BorderLayout.SOUTH);
 	}
 	
-	public void select(Node node) {		
+	public void select(Node node) {
 		this.selected = node;
 		setVisible(selected != null);
 		
@@ -77,7 +106,7 @@ public class StateSpaceEditor<Node extends Position&Nameable&Copyable> extends J
 			public void actionPerformed(ActionEvent e) {
 				select(node);
 				if(listener != null) {
-					listener.nodeSelected(node);
+					listener.select(node);
 				}
 			}		
 		});
@@ -85,7 +114,7 @@ public class StateSpaceEditor<Node extends Position&Nameable&Copyable> extends J
 		return button;
 	}
 	
-	public void setSSVListener(SSVListener<Node> listener) {
+	public void setSSEListener(SSEListener<Node> listener) {
 		this.listener = listener;
 	}
 	

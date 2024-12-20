@@ -23,13 +23,21 @@ public class StateSpaceWindow<Node extends Position&Nameable&Copyable> extends J
 		
 		sse = new StateSpaceEditor<>(space);
 		sse.setPreferredSize(new Dimension(200, 0));
-		sse.setSSVListener(new SSVListener<Node>() {
+		sse.setSSEListener(new SSEListener<Node>() {
+			@Override
+			public void nextIteration() {
+				ssv.nextIteration();
+			}
 
 			@Override
-			public void nodeSelected(Node node) {
-				ssv.select(node);
+			public void continueSearch() {
+				ssv.continueSearch();
 			}
-			
+
+			@Override
+			public void select(Node node) {
+				ssv.select(node);
+			}	
 		});
 		add(sse, BorderLayout.WEST);
 		

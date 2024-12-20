@@ -37,6 +37,7 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 	private SSVListener<Node> listener = null;
 	private int nodesOnScreen = 0;
 	private boolean showHeuristic = true;
+	private boolean showPathCost = true;
 	private ArrayList<Node> path = new ArrayList<>();
 	private Node selected = null;
 	
@@ -51,7 +52,8 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 		
 		setSpace(space);
 		searchAlgorithm = AStarSearch.autoHeuristic(space);
-		path = searchAlgorithm.search();
+		searchAlgorithm.initializeSearch();
+//		path = searchAlgorithm.search();
 	}
 	
 	@Override
@@ -105,16 +107,22 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 			g.setStroke(new BasicStroke(node.equals(selected) ? 3 : 1));
 			
 			Vector nameSize = getStringSize(g, node.getName());
-			int nameYOffset = showHeuristic ? (int) (nameSize.y() / 2) : 0;
+			int nameYOffset = (showHeuristic || showPathCost) ? (int) (nameSize.y() / 2) : 0;
 			Vector namePosition = translatedOvalCenter.translated(nameSize.x() * -0.5, nameSize.y() * 0.25 - nameYOffset);
+			
 			g.drawString(node.getName(), (int) namePosition.x(), (int) namePosition.y());
 			g.drawOval((int) translatedOvalPosition.x(), (int) translatedOvalPosition.y(), getNodeSize(), getNodeSize());
 			
-			if(showHeuristic) {
-				Vector heuristicSize = getStringSize(g, "69");
+			if(showHeuristic || showPathCost) {
+				Double cost = searchAlgorithm.minCostToNode.get(node);
+				String heuristic = "∞";
+				if(cost != null) {
+					heuristic = cost.toString();
+				}
+				Vector heuristicSize = getStringSize(g, heuristic);
 				Vector heuristicPosition = translatedOvalCenter.translated(heuristicSize.x() * -0.5, heuristicSize.y() * 0.25 + nameYOffset);
 				g.setColor(Color.BLUE);
-				g.drawString("69", (int) heuristicPosition.x(), (int) heuristicPosition.y());
+				g.drawString(heuristic, (int) heuristicPosition.x(), (int) heuristicPosition.y());
 			}
 			g.setColor(Color.BLACK);
 			
@@ -238,7 +246,27 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 	public void setSSVListener(SSVListener<Node> listener) {
 		this.listener = listener;
 	}
+	
+	public void nextIteration() {
+		ArrayList<Node> path = searchAlgorithm.iterateSearch();
+		if(path != null) this.path = path;
+		repaint();
+	}
 
+	public void continueSearch() {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {				
+				while(path.isEmpty()) {
+					nextIteration();
+					try {
+						Thread.sleep(100);
+					} catch(Exception e) {}
+				}
+			}	
+		}).start();
+	}
+	
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		if(listener == null) return;

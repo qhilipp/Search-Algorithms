@@ -36,11 +36,12 @@ public class GeneralSearch<Node> {
 		return null;
 	}
 	
-	HashMap<Node, Double> minCostToNode = new HashMap<>();
-	ArrayList<Node> startPath = new ArrayList<>();
+	public HashMap<Node, Double> minCostToNode = new HashMap<>();
+	public ArrayList<Node> startPath = new ArrayList<>();
 	public void initializeSearch() {
 		strategy.clear();
 		minCostToNode.clear();
+		minCostToNode.put(space.getStart(), 0.0);
 		loopHandler.initialize();
 		startPath.clear();
 		startPath.add(space.getStart());	
