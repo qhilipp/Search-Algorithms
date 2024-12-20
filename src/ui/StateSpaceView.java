@@ -58,7 +58,7 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 			translatedOvalPosition.translate(-getNodeSize() / 2, -getNodeSize() / 2);
 			Vector translatedOvalCenter = spaceToPixel(node.getPosition());
 			
-			if(!isInBounds(translatedOvalPosition)) continue;
+			if(!isInBounds(node)) continue;
 
 			g.setColor(Color.WHITE);
 			g.fillOval((int) translatedOvalPosition.x(), (int) translatedOvalPosition.y(), getNodeSize(), getNodeSize());
@@ -148,18 +148,28 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 			Node node = nodes.remove(0);
 			cachedNodes.add(node);
 			
-			for(Node neighbor : space.getNeighbors(node)) {
-				Vector translatedNeighborPosition = spaceToPixel(neighbor.getPosition());
-				
-				if(isInBounds(translatedNeighborPosition) && !cachedNodes.contains(neighbor)) {
+			for(Node neighbor : space.getNeighbors(node)) {				
+				if(isInBounds(neighbor) && !cachedNodes.contains(neighbor)) {
 					nodes.add(neighbor);
 				}
 			}
 		}
 	}
 	
-	private boolean isInBounds(Vector point) {
-		return point.x() >= -getNodeSize() && point.x() <= getWidth() + getNodeSize() && point.y() >= -getNodeSize() && point.y() <= getHeight() + getNodeSize();
+	private boolean isInBounds(Node node) {
+		return isInBounds(node, 1);
+	}
+	
+	private boolean isInBounds(Node point, int depth) {
+		if(depth > 0) {
+			for(Node neighbor : space.getNeighbors(point)) {
+				if(isInBounds(neighbor, depth-1)) return true;
+			}
+		}
+		return  point.getPosition().x() >= view.x() &&
+				point.getPosition().x() <= view.x() + view.width() &&
+				point.getPosition().y() >= view.y() &&
+				point.getPosition().y() <= view.y() + view.height();
 	}
 	
 	private Vector spaceToPixel(Position position) {
