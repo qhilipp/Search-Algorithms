@@ -80,6 +80,25 @@ public class Vector implements Position, Nameable, Copyable {
 		return clone;
 	}
 	
+	public void uniform(Measurement measurement) {
+		scale(1 / getLength(measurement));
+	}
+	
+	public Vector uniformed(Measurement measurement) {
+		Vector clone = (Vector) this.copy();
+		clone.uniform(measurement);
+		return clone;
+	}
+	
+	public double getLength(Measurement measurement) {
+		return distance(new Vector(getDimensions()), measurement);
+	}
+	
+	public void setLength(Measurement measurement, double length) {
+		uniform(measurement);
+		scale(length);
+	}
+	
 	public double x() {
 		return get(0);
 	}
