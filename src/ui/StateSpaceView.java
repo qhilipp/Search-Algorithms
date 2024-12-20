@@ -43,7 +43,7 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 	private Node selected = null;
 	private Dimension oldSize;
 	
-	public StateSpaceView(StateSpace<Node> space) {
+	public StateSpaceView(StateSpace<Node> space, GeneralSearch<Node> searchAlgorithm) {
 		setSize(600, 600);
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -56,7 +56,7 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 		view = new Rectangle(space.getStart().getPosition().x() - size / 2, space.getStart().getPosition().y() - size / 2, size, size);
 		
 		setSpace(space);
-		searchAlgorithm = AStarSearch.autoHeuristic(space);
+		this.searchAlgorithm = searchAlgorithm;
 		searchAlgorithm.initializeSearch();
 	}
 	
@@ -74,7 +74,7 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 			
 			if(!isInBounds(node)) continue;
 
-			Color fillColor = path.contains(node) ? Color.GREEN : Color.WHITE;
+			Color fillColor = getNodeFillColor(node);
 			
 			g.setColor(fillColor);
 			g.fillOval((int) translatedOvalPosition.x(), (int) translatedOvalPosition.y(), getNodeSize(), getNodeSize());	
@@ -123,6 +123,12 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 			
 			nodesOnScreen++;
 		}
+	}
+	
+	private Color getNodeFillColor(Node node) {
+		if(path.contains(node)) return Color.green;
+		if(searchAlgorithm.minCostToNode.containsKey(node)) return new Color(101, 201, 235);
+		return Color.white;
 	}
 	
 	private boolean arrowIsInPath(Node from, Node to) {

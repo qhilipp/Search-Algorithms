@@ -5,6 +5,7 @@ import java.awt.Dimension;
 
 import javax.swing.JFrame;
 
+import searchAlgorithms.GeneralSearch;
 import stateSpace.StateSpace;
 import util.Copyable;
 import util.Nameable;
@@ -15,7 +16,7 @@ public class StateSpaceWindow<Node extends Position&Nameable&Copyable> extends J
 	private StateSpaceView<Node> ssv;
 	private StateSpaceEditor<Node> sse;
 	
-	public StateSpaceWindow(StateSpace<Node> space) {
+	public StateSpaceWindow(StateSpace<Node> space, GeneralSearch<Node> searchAlgorithm) {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(800, 600);
 		setLocationRelativeTo(null);
@@ -41,7 +42,7 @@ public class StateSpaceWindow<Node extends Position&Nameable&Copyable> extends J
 		});
 		add(sse, BorderLayout.WEST);
 		
-		ssv = new StateSpaceView<>(space);
+		ssv = new StateSpaceView<>(space, searchAlgorithm);
 		ssv.setSSVListener(new SSVListener<Node>() {
 
 			@Override
