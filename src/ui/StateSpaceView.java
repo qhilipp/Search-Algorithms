@@ -327,7 +327,7 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 		view.size.set(0, view.size.get(0) * widthDelta);
 		view.size.set(1, view.size.get(1) * heightDelta);
 		oldSize = getSize();
-		repaint();
+		cacheNodes();
 	}
 
 	@Override
