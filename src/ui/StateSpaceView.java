@@ -2,10 +2,13 @@ package ui;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -26,7 +29,7 @@ import util.Position;
 import util.Rectangle;
 import util.Vector;
 
-public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener {
+public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener, ComponentListener {
 
 	private StateSpace<Node> space;
 	private GeneralSearch<Node> searchAlgorithm;
@@ -38,12 +41,16 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 	private int nodesOnScreen = 0;
 	private ArrayList<Node> path = new ArrayList<>();
 	private Node selected = null;
+	private Dimension oldSize;
 	
 	public StateSpaceView(StateSpace<Node> space) {
 		setSize(600, 600);
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addMouseWheelListener(this);
+		addComponentListener(this);
+		
+		oldSize = getSize();
 		
 		int size = 6;
 		view = new Rectangle(space.getStart().getPosition().x() - size / 2, space.getStart().getPosition().y() - size / 2, size, size);
@@ -51,7 +58,6 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 		setSpace(space);
 		searchAlgorithm = AStarSearch.autoHeuristic(space);
 		searchAlgorithm.initializeSearch();
-//		path = searchAlgorithm.search();
 	}
 	
 	@Override
@@ -313,5 +319,24 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 		
 		repaint();
 	}
+
+	@Override
+	public void componentResized(ComponentEvent e) {
+		double widthDelta = getWidth() / oldSize.getWidth();
+		double heightDelta = getHeight() / oldSize.getHeight();
+		view.size.set(0, view.size.get(0) * widthDelta);
+		view.size.set(1, view.size.get(1) * heightDelta);
+		oldSize = getSize();
+		repaint();
+	}
+
+	@Override
+	public void componentMoved(ComponentEvent e) {}
+
+	@Override
+	public void componentShown(ComponentEvent e) {}
+
+	@Override
+	public void componentHidden(ComponentEvent e) {}
 	
 }
