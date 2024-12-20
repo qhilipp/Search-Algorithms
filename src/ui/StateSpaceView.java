@@ -70,8 +70,7 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 			Color fillColor = path.contains(node) ? Color.GREEN : Color.WHITE;
 			
 			g.setColor(fillColor);
-			g.fillOval((int) translatedOvalPosition.x(), (int) translatedOvalPosition.y(), getNodeSize(), getNodeSize());
-						
+			g.fillOval((int) translatedOvalPosition.x(), (int) translatedOvalPosition.y(), getNodeSize(), getNodeSize());	
 			
 			for(Node neighbor : space.getNeighbors(node)) {
 				boolean highlightArrow = arrowIsInPath(node, neighbor);
