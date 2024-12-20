@@ -30,7 +30,7 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 
 	private StateSpace<Node> space;
 	private GeneralSearch<Node> searchAlgorithm;
-	private Rectangle view = new Rectangle(-2, -2, 4, 4);;
+	private Rectangle view;
 	private HashSet<Node> cachedNodes = new HashSet<>();
 	private Vector dragStartLocation = null;
 	private Font nodeFont = new Font("Arial", Font.PLAIN, 15);
@@ -45,6 +45,9 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 		addMouseMotionListener(this);
 		addMouseWheelListener(this);
 		
+		int size = 6;
+		view = new Rectangle(space.getStart().getPosition().x() - size / 2, space.getStart().getPosition().y() - size / 2, size, size);
+		
 		setSpace(space);
 		searchAlgorithm = AStarSearch.autoHeuristic(space);
 		path = searchAlgorithm.search();
@@ -53,6 +56,7 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 	@Override
 	public void paint(Graphics g0) {
 		Graphics2D g = (Graphics2D) g0;
+		g.setStroke(new BasicStroke(1));
 		
 		nodesOnScreen = 0;
 		
