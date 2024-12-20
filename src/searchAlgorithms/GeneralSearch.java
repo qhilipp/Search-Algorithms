@@ -26,31 +26,42 @@ public class GeneralSearch<Node> {
 	}
 	
 	public ArrayList<Node> search() {
-		strategy.clear();
-		HashMap<Node, Double> minCostToNode = new HashMap<>();
-		loopHandler.initialize();
-		
-		ArrayList<Node> startPath = new ArrayList<>();
-		startPath.add(space.getStart());
-		
-		strategy.add(startPath, rate(startPath));
+		initializeSearch();
 		
 		while(!strategy.isEmpty()) {
-			ArrayList<Node> path = strategy.get();
+			ArrayList<Node> pathToGoal = iterateSearch();
+			if(pathToGoal != null) return pathToGoal;
+		}
+		
+		return null;
+	}
+	
+	HashMap<Node, Double> minCostToNode = new HashMap<>();
+	ArrayList<Node> startPath = new ArrayList<>();
+	public void initializeSearch() {
+		strategy.clear();
+		minCostToNode.clear();
+		loopHandler.initialize();
+		startPath.clear();
+		startPath.add(space.getStart());	
+		strategy.add(startPath, rate(startPath));
+	}
+	
+	public ArrayList<Node> iterateSearch() {
+		ArrayList<Node> path = strategy.get();
+		
+		if(space.isGoal(path.getLast())) return path;
+		
+		for(Node neighbor : space.getNeighbors(path.getLast())) {
+			double pathCost = pathEvaluator.pastCost(space, path);
 			
-			if(space.isGoal(path.getLast())) return path;
+			if(!loopHandler.shouldVisitNode(neighbor, path, pathCost, minCostToNode)) continue;
 			
-			for(Node neighbor : space.getNeighbors(path.getLast())) {
-				double pathCost = pathEvaluator.pastCost(space, path);
-				
-				if(!loopHandler.shouldVisitNode(neighbor, path, pathCost, minCostToNode)) continue;
-				
-				ArrayList<Node> newPath = new ArrayList<Node>(path);
-				newPath.add(neighbor);
-				minCostToNode.put(neighbor, pathCost);
-				
-				strategy.add(newPath, rate(newPath));
-			}
+			ArrayList<Node> newPath = new ArrayList<Node>(path);
+			newPath.add(neighbor);
+			minCostToNode.put(neighbor, pathCost);
+			
+			strategy.add(newPath, rate(newPath));
 		}
 		
 		return null;
