@@ -56,13 +56,15 @@ public class Cartesian<Node extends Position&Nameable&Copyable> extends StateSpa
 			for(int[] subset : generateSubsets(dimensionDifferences)) {
 				for(int distro = 0; distro < Math.pow(2, dimensionDifferences); distro++) {
 					int distroCopy = distro;
-					Node neighbor = (Node) node.copy();
+					Vector neighborPosition = node.getPosition();
 					for(int index : subset) {
 						int offset = distroCopy % 2 == 0 ? -1 : 1;
-						neighbor.getPosition().set(index, node.getPosition().get(index) + offset);
+						neighborPosition.set(index, node.getPosition().get(index) + offset);
 						distroCopy /= 2;
 					}
-					if(!map.containsKey(neighbor) || map.get(neighbor)) neighbors.add(neighbor);
+					Node neighbor = (Node) node.copy();
+					neighbor.setPosition(neighborPosition);
+					if(!map.containsKey(neighbor.getPosition()) || map.get(neighbor.getPosition())) neighbors.add(neighbor);
 				}
 			}
 		}

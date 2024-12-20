@@ -113,7 +113,12 @@ public class Vector implements Position, Nameable, Copyable {
 	
 	@Override
 	public Vector getPosition() {
-		return this;
+		return new Vector(components);
+	}
+	
+	@Override
+	public void setPosition(Vector position) {
+		this.components = position.components.clone();
 	}
 	
 	@Override
