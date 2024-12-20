@@ -23,6 +23,14 @@ public class StateSpaceWindow<Node extends Position&Nameable&Copyable> extends J
 		
 		sse = new StateSpaceEditor<>(space);
 		sse.setPreferredSize(new Dimension(200, 0));
+		sse.setSSVListener(new SSVListener<Node>() {
+
+			@Override
+			public void nodeSelected(Node node) {
+				ssv.select(node);
+			}
+			
+		});
 		add(sse, BorderLayout.WEST);
 		
 		ssv = new StateSpaceView<>(space);

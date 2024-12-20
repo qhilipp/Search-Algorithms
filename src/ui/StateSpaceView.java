@@ -38,6 +38,7 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 	private int nodesOnScreen = 0;
 	private boolean showHeuristic = true;
 	private ArrayList<Node> path = new ArrayList<>();
+	private Node selected = null;
 	
 	public StateSpaceView(StateSpace<Node> space) {
 		setSize(600, 600);
@@ -101,7 +102,7 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 			}
 			
 			g.setColor(Color.BLACK);
-			g.setStroke(new BasicStroke(1));
+			g.setStroke(new BasicStroke(node.equals(selected) ? 3 : 1));
 			
 			Vector nameSize = getStringSize(g, node.getName());
 			int nameYOffset = showHeuristic ? (int) (nameSize.y() / 2) : 0;
@@ -221,6 +222,11 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 		return space;
 	}
 	
+	public void select(Node node) {
+		selected = node;
+		repaint();
+	}
+	
 	public void setSpace(StateSpace<Node> space) {
 		if(space.getStart().getPosition().getDimensions() != 2) {
 			return;
@@ -239,6 +245,7 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 		for(Node node : cachedNodes) {
 			if(spaceToPixel(node).distance(new Vector(e.getX(), e.getY()), Measurement.EUCLIDEAN) < getNodeSize() / 2) {
 				listener.nodeSelected(node);
+				selected = node;
 				return;
 			}
 		}

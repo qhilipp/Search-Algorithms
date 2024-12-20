@@ -2,19 +2,16 @@ package ui;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingConstants;
 
 import stateSpace.StateSpace;
 import util.Copyable;
@@ -29,6 +26,8 @@ public class StateSpaceEditor<Node extends Position&Nameable&Copyable> extends J
 	private JLabel nameLabel;
     private JPanel neighborsList;
     private JScrollPane scrollPane;
+    
+    private SSVListener<Node> listener;
 	
 	public StateSpaceEditor(StateSpace<Node> space) {
 		this.space = space;
@@ -77,10 +76,17 @@ public class StateSpaceEditor<Node extends Position&Nameable&Copyable> extends J
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				select(node);
+				if(listener != null) {
+					listener.nodeSelected(node);
+				}
 			}		
 		});
 		
 		return button;
+	}
+	
+	public void setSSVListener(SSVListener<Node> listener) {
+		this.listener = listener;
 	}
 	
 }
