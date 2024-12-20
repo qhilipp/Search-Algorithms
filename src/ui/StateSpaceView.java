@@ -15,30 +15,36 @@ import java.util.HashSet;
 
 import javax.swing.JPanel;
 
+import searchAlgorithms.AStarSearch;
+import searchAlgorithms.GeneralSearch;
 import stateSpace.StateSpace;
+import util.Copyable;
 import util.Measurement;
 import util.Nameable;
 import util.Position;
 import util.Rectangle;
 import util.Vector;
 
-public class StateSpaceView<Node extends Position & Nameable> extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener {
+public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener {
 
 	private StateSpace<Node> space;
+	private GeneralSearch<Node> searchAlgorithm;
 	private Rectangle view = new Rectangle(-2, -2, 4, 4);;
 	private HashSet<Node> cachedNodes = new HashSet<>();
 	private Vector dragStartLocation = null;
-	private Font nodeFont = new Font("Arial", Font.PLAIN, 16);
+	private Font nodeFont = new Font("Arial", Font.PLAIN, 15);
 	private SSVListener<Node> listener = null;
 	private int nodesOnScreen = 0;
+	private boolean showHeuristic = true;
 	
 	public StateSpaceView(StateSpace<Node> space) {
-//		setSpace(space);
-		
 		setSize(600, 600);
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addMouseWheelListener(this);
+		
+		setSpace(space);
+		searchAlgorithm = AStarSearch.autoHeuristic(space);
 	}
 	
 	@Override
@@ -131,11 +137,12 @@ public class StateSpaceView<Node extends Position & Nameable> extends JPanel imp
 	private void cacheNodes() {
 		ArrayList<Node> nodes = new ArrayList<>();
 		nodes.addAll(cachedNodes);
-		if(!nodes.contains(space.getStart())) {
+		
+		if(nodes.isEmpty()) {
 			nodes.add(space.getStart());
 		}
+		
 		cachedNodes.clear();
-		cachedNodes.add(nodes.getFirst());
 		
 		while(!nodes.isEmpty()) {
 			Node node = nodes.remove(0);
@@ -160,7 +167,7 @@ public class StateSpaceView<Node extends Position & Nameable> extends JPanel imp
 		double translatedY = (position.getPosition().y() - view.y()) / view.height() * getHeight();
 		return new Vector(translatedX, translatedY);
 	}
-		
+	
 	private Vector pixelToSpace(double x, double y) {
 		double convertedX = x / getWidth() * view.width() + view.x();
 		double convertedY = y / getHeight() * view.height() + view.y();
@@ -232,8 +239,8 @@ public class StateSpaceView<Node extends Position & Nameable> extends JPanel imp
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		double scaleFactor = Math.min(1.05, 1 + -e.getPreciseWheelRotation() / 30);
-		if(nodesOnScreen > 100 && scaleFactor > 1) return;
+		double scaleFactor = Math.min(1.08, 1 + -e.getPreciseWheelRotation() / 30);
+		if(nodesOnScreen > 200 && scaleFactor > 1) return;
 		
 		Vector beforeScale = pixelToSpace(e.getX(), e.getY());
 		
