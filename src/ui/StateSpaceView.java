@@ -36,8 +36,6 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 	private Font nodeFont = new Font("Arial", Font.PLAIN, 15);
 	private SSVListener<Node> listener = null;
 	private int nodesOnScreen = 0;
-	private boolean showHeuristic = true;
-	private boolean showPathCost = true;
 	private ArrayList<Node> path = new ArrayList<>();
 	private Node selected = null;
 	
@@ -107,24 +105,10 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 			g.setStroke(new BasicStroke(node.equals(selected) ? 3 : 1));
 			
 			Vector nameSize = getStringSize(g, node.getName());
-			int nameYOffset = (showHeuristic || showPathCost) ? (int) (nameSize.y() / 2) : 0;
-			Vector namePosition = translatedOvalCenter.translated(nameSize.x() * -0.5, nameSize.y() * 0.25 - nameYOffset);
+			Vector namePosition = translatedOvalCenter.translated(nameSize.x() * -0.5, nameSize.y() * 0.25);
 			
 			g.drawString(node.getName(), (int) namePosition.x(), (int) namePosition.y());
 			g.drawOval((int) translatedOvalPosition.x(), (int) translatedOvalPosition.y(), getNodeSize(), getNodeSize());
-			
-			if(showHeuristic || showPathCost) {
-				Double cost = searchAlgorithm.minCostToNode.get(node);
-				String heuristic = "∞";
-				if(cost != null) {
-					heuristic = cost.toString();
-				}
-				Vector heuristicSize = getStringSize(g, heuristic);
-				Vector heuristicPosition = translatedOvalCenter.translated(heuristicSize.x() * -0.5, heuristicSize.y() * 0.25 + nameYOffset);
-				g.setColor(Color.BLUE);
-				g.drawString(heuristic, (int) heuristicPosition.x(), (int) heuristicPosition.y());
-			}
-			g.setColor(Color.BLACK);
 			
 			if(space.isGoal(node)) {
 				int offset = 2;
