@@ -2,7 +2,7 @@ package util;
 
 import java.util.Arrays;
 
-public class Vector implements Position, Nameable, Cloneable {
+public class Vector implements Position, Nameable, Copyable {
 	protected double[] components;
 	
 	public Vector(int dimensions) {
@@ -65,7 +65,7 @@ public class Vector implements Position, Nameable, Cloneable {
 	}
 	
 	public Vector translated(Vector delta) {
-		Vector clone = (Vector) this.cloneObject();
+		Vector clone = (Vector) this.copy();
 		clone.translate(delta);
 		return clone;
 	}
@@ -75,7 +75,7 @@ public class Vector implements Position, Nameable, Cloneable {
 	}
 	
 	public Vector scaled(double factor) {
-		Vector clone = (Vector) this.cloneObject();
+		Vector clone = (Vector) this.copy();
 		clone.scale(factor);
 		return clone;
 	}
@@ -133,7 +133,7 @@ public class Vector implements Position, Nameable, Cloneable {
 	}
 
 	@Override
-	public Object cloneObject() {
+	public Object copy() {
 		return new Vector(components);
 	}
 
