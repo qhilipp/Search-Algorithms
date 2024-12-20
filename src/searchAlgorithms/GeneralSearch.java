@@ -54,12 +54,13 @@ public class GeneralSearch<Node> {
 		if(space.isGoal(path.getLast())) return path;
 		
 		for(Node neighbor : space.getNeighbors(path.getLast())) {
-			double pathCost = pathEvaluator.pastCost(space, path);
-			
-			if(!loopHandler.shouldVisitNode(neighbor, path, pathCost, minCostToNode)) continue;
-			
 			ArrayList<Node> newPath = new ArrayList<Node>(path);
 			newPath.add(neighbor);
+			
+			double pathCost = pathEvaluator.pastCost(space, newPath);
+			
+			if(!loopHandler.shouldVisitNode(neighbor, newPath, pathCost, minCostToNode)) continue;
+			
 			minCostToNode.put(neighbor, pathCost);
 			
 			strategy.add(newPath, rate(newPath));
