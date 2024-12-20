@@ -64,18 +64,30 @@ public class StateSpaceView<Node extends Position & Nameable> extends JPanel imp
 				Vector nodeOffset = interpolate(translatedOvalCenter, translatedNeighborCenter, getNodeSize() / 2);
 				int[] xPos = new int[3];
 				int[] yPos = new int[3];
-				xPos[0] = (int) neighborOffset.x();
-				yPos[0] = (int) neighborOffset.y();
-				Vector triangleBase = interpolate(translatedOvalCenter, translatedNeighborCenter, getNodeSize() / 1.5);
-				
-//				g.fillPolygon(null, null, ABORT);
+				Vector[] triangleCorners = getTriangle(translatedOvalCenter, translatedNeighborCenter);
+				xPos[0] = (int) triangleCorners[0].x();
+				yPos[0] = (int) triangleCorners[0].y();
+				xPos[1] = (int) triangleCorners[1].x();
+				yPos[1] = (int) triangleCorners[1].y();
+				xPos[2] = (int) triangleCorners[2].x();
+				yPos[2] = (int) triangleCorners[2].y();
+				g.fillPolygon(xPos, yPos, xPos.length);
 				g.drawLine((int) nodeOffset.x(), (int) nodeOffset.y(), (int) neighborOffset.x(), (int) neighborOffset.y());
 			}
 			
-			Vector textSize = getStringSize(g, node.getName());
-			Vector textPosition = translatedOvalCenter.translated(textSize.x() * -0.5, textSize.y() * 0.25);
-			g.drawString(node.getName(), (int) textPosition.x(), (int) textPosition.y());
+			Vector nameSize = getStringSize(g, node.getName());
+			int nameYOffset = showHeuristic ? (int) (nameSize.y() / 2) : 0;
+			Vector namePosition = translatedOvalCenter.translated(nameSize.x() * -0.5, nameSize.y() * 0.25 - nameYOffset);
+			g.drawString(node.getName(), (int) namePosition.x(), (int) namePosition.y());
 			g.drawOval((int) translatedOvalPosition.x(), (int) translatedOvalPosition.y(), getNodeSize(), getNodeSize());
+			
+			if(showHeuristic) {
+				Vector heuristicSize = getStringSize(g, "69");
+				Vector heuristicPosition = translatedOvalCenter.translated(heuristicSize.x() * -0.5, heuristicSize.y() * 0.25 + nameYOffset);
+				g.setColor(Color.BLUE);
+				g.drawString("69", (int) heuristicPosition.x(), (int) heuristicPosition.y());
+			}
+			g.setColor(Color.BLACK);
 			
 			if(space.isGoal(node)) {
 				int offset = 2;
@@ -84,6 +96,21 @@ public class StateSpaceView<Node extends Position & Nameable> extends JPanel imp
 			
 			nodesOnScreen++;
 		}
+	}
+	
+	private Vector[] getTriangle(Vector from, Vector to) {
+		double width = getNodeSize() / 10;
+		double height = getNodeSize() / 4;
+		
+		Vector base = interpolate(to, from, height);
+		Vector direction = from.translated(to.scaled(-1));
+		Vector perpendicularDirection = new Vector(-direction.y(), direction.x());
+		perpendicularDirection.setLength(Measurement.EUCLIDEAN, width);
+		
+		Vector a = interpolate(base.translated(perpendicularDirection), from, getNodeSize() / 2);
+		Vector b = interpolate(base.translated(perpendicularDirection.scaled(-1)), from, getNodeSize() / 2);
+		
+		return new Vector[] { interpolate(to, from, getNodeSize() / 2), a, b };
 	}
 	
 	private Vector interpolate(Vector a, Vector b, double length) {
@@ -141,7 +168,7 @@ public class StateSpaceView<Node extends Position & Nameable> extends JPanel imp
 	}
 	
 	private int getNodeSize() {
-		return (int) (nodeFont.getSize() * 2.5);
+		return (int) (nodeFont.getSize() * 3);
 	}
 	
 	public StateSpace<Node> getSpace() {

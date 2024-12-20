@@ -15,7 +15,7 @@ public class NamedVector extends Vector {
 	
 	@Override
 	public String getName() {
-		if(name == null) return toString();
+		if(name == null) return super.getName();
 		return name;
 	}
 	
@@ -28,13 +28,13 @@ public class NamedVector extends Vector {
 	public boolean equals(Object obj) {
 		if(obj == this) return true;
 		if(obj == null) return false;
-		if(obj.getClass() != Vector.class) return false;
+		if(obj.getClass() != NamedVector.class) return false;
 		NamedVector other = (NamedVector) obj;
-		return other.name.equals(name);
+		return other.getName().equals(getName());
 	}
 	
 	@Override
-	public Object cloneObject() {
+	public Object copy() {
 		return new NamedVector(name, components);
 	}
 	
