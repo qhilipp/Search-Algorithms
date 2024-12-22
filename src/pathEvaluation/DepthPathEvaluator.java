@@ -8,7 +8,7 @@ public class DepthPathEvaluator<Node> implements PathEvaluator<Node> {
 
 	@Override
 	public double pastCost(StateSpace<Node> space, ArrayList<Node> path) {
-		return path.size();
+		return Math.max(0, path.size() - 1);
 	}
 
 }
