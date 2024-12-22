@@ -4,9 +4,13 @@ import java.util.ArrayList;
 
 public abstract class SearchStrategy<Node> {
 
-	protected ArrayList<NodeRating> list = new ArrayList<>();
+	private ArrayList<NodeRating> list = new ArrayList<>();	
 	
 	public abstract void add(Node node, double rating);
+	
+	public Node read() {
+		return list.get(0).node;
+	}
 	
 	public Node get() {
 		return list.removeFirst().node;
@@ -28,6 +32,10 @@ public abstract class SearchStrategy<Node> {
 		list.add(index < 0 ? list.size() + index + 1 : index, new NodeRating(node, rating));
 	}
 	
+	public ArrayList<NodeRating> getList() {
+		return list;
+	}
+	
 	@Override
 	public String toString() {
 		String[] strs = new String[list.size()];
@@ -35,9 +43,9 @@ public abstract class SearchStrategy<Node> {
 		return "[" + String.join(", ", strs) + "]";
 	}
 	
-	class NodeRating {
-		Node node;
-		double rating;
+	public class NodeRating {
+		public Node node;
+		public double rating;
 		
 		NodeRating(Node node, double rating) {
 			this.node = node;
