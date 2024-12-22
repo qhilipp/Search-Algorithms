@@ -90,4 +90,24 @@ public class GeneralSearch<Node> {
 		space.setStart(initialStart);
 		return true;
 	}
+	
+	public StateSpace<Node> getStateSpace() {
+		return space;
+	}
+	
+	public SearchStrategy<ArrayList<Node>> getStrategy() {
+		return strategy;
+	}
+	
+	public Heuristic<Node> getHeuristic() {
+		return heuristic;
+	}
+	
+	public PathEvaluator<Node> getPathEvaluator() {
+		return pathEvaluator;
+	}
+	
+	public LoopHandler<Node> getLoopHandler() {
+		return loopHandler;
+	}
 }
