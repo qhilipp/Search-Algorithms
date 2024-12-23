@@ -3,14 +3,8 @@ package searchStrategy;
 public class Uniform<Node> extends SearchStrategy<Node> {
 
 	@Override
-	public void add(Node node, double rating) {
-		for(int i = 0; i < getList().size(); i++) {
-			if(rating <= get(i).rating) {
-				insert(node, rating, i);
-				return;
-			}
-		}
-		insert(node, rating, -1);
+	public boolean shouldBeBehind(Node newPath, double newRating, Node existingPath, double existingRating) {
+		return newRating > existingRating;
 	}
 
 }

@@ -1,10 +1,10 @@
 package searchStrategy;
 
 public class BreadthFirst<Node> extends SearchStrategy<Node> {
-	
+
 	@Override
-	public void add(Node node, double rating) {
-		insert(node, rating, -1);
+	public boolean shouldBeBehind(Node newPath, double newRating, Node existingPath, double existingRating) {
+		return true;
 	}
 	
 }
