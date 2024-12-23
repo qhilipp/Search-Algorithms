@@ -66,7 +66,11 @@ public class StateSpaceWindow<Node extends Position&Nameable&Copyable> extends J
 			
 			@Override
 			public void setSearchSpeed(int speed) {
-				int delay = 30000 / (speed);
+				double p = 0.1;
+				double a = 5000 / (1 - Math.pow(100, -p));
+		        double b = 5000 - a;
+		        int delay = (int) (a * Math.pow(speed, -p) + b);
+		        System.out.println(delay);
 				ssv.setSearchDelay(delay);
 			}
 		});
