@@ -1,10 +1,12 @@
 package searchStrategy;
 
-public class BreadthFirst<Node> extends SearchStrategy<Node> {
+import java.util.ArrayList;
+
+public class BreadthFirst<Node> implements PathSorter<Node> {
 
 	@Override
-	public boolean shouldBeBehind(Node newPath, double newRating, Node existingPath, double existingRating) {
-		return true;
+	public boolean shouldPrecede(ArrayList<Node> newPath, double newRating, ArrayList<Node> existingPath, double existingRating) {
+		return newPath.size() < existingPath.size();
 	}
 	
 }

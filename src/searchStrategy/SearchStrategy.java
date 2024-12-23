@@ -1,15 +1,23 @@
 package searchStrategy;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
-public abstract class SearchStrategy<Path> {
+public class SearchStrategy<Node> {
 
 	private ArrayList<PathRating> list = new ArrayList<>();
 	private ArrayList<PathRating> history = new ArrayList<>();
+	private ArrayList<PathSorter<Node>> pathSorters = new ArrayList<>();
 	
-	public abstract boolean shouldBeBehind(Path newPath, double newRating, Path existingPath, double existingRating);
+	public SearchStrategy(ArrayList<PathSorter<Node>> pathSorters) {
+		this.pathSorters = pathSorters;
+	}
 	
-	public Path get() {
+	public SearchStrategy(PathSorter<Node>...pathSorters) {
+		for(PathSorter<Node> pathSorter : pathSorters) this.pathSorters.add(pathSorter);
+	}
+		
+	public ArrayList<Node> get() {
 		return list.removeFirst().path;
 	}
 	
@@ -31,29 +39,21 @@ public abstract class SearchStrategy<Path> {
 		history.clear();
 	}
 	
-	public void add(Path path, double rating) {
-		if(isEmpty()) {
-			list.add(new PathRating(path, rating));
-//			history.add(new PathRating(path, rating));
+	public void add(ArrayList<Node> path, double rating) {
+		insert(path, rating, list);
+		insert(path, rating, history);
+	}
+	
+	private void insert(ArrayList<Node> path, double rating, ArrayList<PathRating> list) {
+		list.add(new PathRating(path, rating));
+		for(PathSorter<Node> pathSorter : pathSorters) {
+			list.sort(new Comparator<PathRating>() {
+				@Override
+				public int compare(SearchStrategy<Node>.PathRating o1, SearchStrategy<Node>.PathRating o2) {
+					return pathSorter.shouldPrecede(o1.path, o1.rating, o2.path, o2.rating) ? -1 : 1;
+				}
+			});
 		}
-		boolean addedToList = false, addedToHistory = false;
-		for(int i = 0; i < list.size(); i++) {
-			if(!shouldBeBehind(path, rating, list.get(i).path, list.get(i).rating)) {
-				list.add(i, new PathRating(path, rating));
-				addedToList = true;
-				break;
-			}
-		}
-		if(!addedToList) list.add(new PathRating(path, rating));
-//		for(int i = 0; i < history.size(); i++) {
-//			if(!shouldBeBehind(path, rating, history.get(i).path, history.get(i).rating)) {
-//				history.add(i, new PathRating(path, rating));
-//				addedToHistory = true;
-//				break;
-//			}
-//		}
-//		if(!addedToHistory) history.add(new PathRating(path, rating));
-		
 	}
 	
 	public ArrayList<PathRating> getHistory() {
@@ -68,10 +68,10 @@ public abstract class SearchStrategy<Path> {
 	}
 	
 	public class PathRating {
-		public Path path;
+		public ArrayList<Node> path;
 		public double rating;
 		
-		PathRating(Path node, double rating) {
+		PathRating(ArrayList<Node> node, double rating) {
 			this.path = node;
 			this.rating = rating;
 		}

@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import heuristic.Heuristic;
+import loopHandling.GraphLoopHandler;
 import loopHandling.LoopHandler;
-import loopHandling.SmartGraphLoopHandler;
 import pathEvaluation.PathEvaluator;
 import searchStrategy.SearchStrategy;
 import stateSpace.StateSpace;
@@ -13,12 +13,12 @@ import stateSpace.StateSpace;
 public class GeneralSearch<Node> {
 
 	private StateSpace<Node> space;
-	private SearchStrategy<ArrayList<Node>> strategy;
+	private SearchStrategy<Node> strategy;
 	private PathEvaluator<Node> pathEvaluator;
 	private Heuristic<Node> heuristic;
-	private LoopHandler<Node> loopHandler = new SmartGraphLoopHandler<>();
+	private LoopHandler<Node> loopHandler = new GraphLoopHandler<>();
 	
-	public GeneralSearch(StateSpace<Node> space, SearchStrategy<ArrayList<Node>> strategy, PathEvaluator<Node> pathEvaluator, Heuristic<Node> heuristic) {
+	public GeneralSearch(StateSpace<Node> space, SearchStrategy<Node> strategy, PathEvaluator<Node> pathEvaluator, Heuristic<Node> heuristic) {
 		this.space = space;
 		this.strategy = strategy;
 		this.pathEvaluator = pathEvaluator;
@@ -37,12 +37,13 @@ public class GeneralSearch<Node> {
 	}
 	
 	public HashMap<Node, Double> minCostToNode = new HashMap<>();
-	public ArrayList<Node> startPath = new ArrayList<>();
+	public HashMap<Node, Double> minCostToVisitedNode = new HashMap<>();
+	private ArrayList<Node> startPath = new ArrayList<>();
 	public void initializeSearch() {
 		strategy.clear();
 		minCostToNode.clear();
+		minCostToVisitedNode.clear();
 		minCostToNode.put(space.getStart(), 0.0);
-		loopHandler.initialize();
 		startPath.clear();
 		startPath.add(space.getStart());	
 		strategy.add(startPath, rate(startPath));
@@ -50,6 +51,8 @@ public class GeneralSearch<Node> {
 	
 	public ArrayList<Node> iterateSearch() {
 		ArrayList<Node> path = strategy.get();
+		
+		minCostToVisitedNode.put(path.getLast(), pathEvaluator.pastCost(space, path));
 		
 		if(space.isGoal(path.getLast())) return path;
 		
@@ -59,17 +62,16 @@ public class GeneralSearch<Node> {
 			
 			double pathCost = pathEvaluator.pastCost(space, newPath);
 			
-			if(!loopHandler.shouldVisitNode(neighbor, newPath, pathCost, minCostToNode)) continue;
-			
-			minCostToNode.put(neighbor, pathCost);
-			
-			strategy.add(newPath, rate(newPath));
+			if(loopHandler.shouldVisitNode(neighbor, newPath, pathCost, minCostToNode)) {
+				minCostToNode.put(neighbor, pathCost);
+				strategy.add(newPath, rate(newPath));
+			}
 		}
 		
 		return null;
 	}
 	
-	private double rate(ArrayList<Node> path) {
+	public double rate(ArrayList<Node> path) {
 		return pathEvaluator.pastCost(space, path) + heuristic.futureCost(space, path.getLast());
 	}
 	
@@ -95,7 +97,7 @@ public class GeneralSearch<Node> {
 		return space;
 	}
 	
-	public SearchStrategy<ArrayList<Node>> getStrategy() {
+	public SearchStrategy<Node> getStrategy() {
 		return strategy;
 	}
 	
