@@ -1,10 +1,12 @@
 package searchStrategy;
 
-public class Uniform<Node> extends SearchStrategy<Node> {
+import java.util.ArrayList;
+
+public class Uniform<Node> implements PathSorter<Node> {
 
 	@Override
-	public boolean shouldBeBehind(Node newPath, double newRating, Node existingPath, double existingRating) {
-		return newRating > existingRating;
+	public boolean shouldPrecede(ArrayList<Node> newPath, double newRating, ArrayList<Node> existingPath, double existingRating) {
+		return newRating <= existingRating;
 	}
 
 }
