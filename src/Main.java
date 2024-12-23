@@ -1,21 +1,20 @@
-import java.util.ArrayList;
-
 import goalTest.ListGoalTester;
 import searchAlgorithms.AStarSearch;
+import searchAlgorithms.GeneralSearch;
 import stateSpace.Cartesian;
 import stateSpace.Graph;
 import stateSpace.StateSpace;
-import util.Point;
-import util.Vector;
+import ui.StateSpaceWindow;
+import util.NamedVector;
 
 public class Main {
 
 	public static void main(String[] args) {
-		printPath(searchCartesianSpace());
+		new StateSpaceWindow<>(cartesianSearch());
 	}
 	
-	static ArrayList<Vector> searchCartesianSpace() {
-		Vector[] goals = { new Vector(1, 8) };
+	static GeneralSearch<NamedVector> cartesianSearch() {
+		NamedVector[] goals = { new NamedVector(4, 5) };
 		boolean[][] map = {
 				{ false, false, false, false, false, false, false },
 				{ false,  true,  true,  true,  true,  true, false },
@@ -28,22 +27,21 @@ public class Main {
 				{ false,  true, false,  true, false,  true, false },
 				{ false, false, false, false, false, false, false },
 		};
-		Cartesian space = new Cartesian(new Vector(3, 8), 2, new ListGoalTester<>(goals), map);
-		
-		return AStarSearch.autoHeuristic(space).search();
+		Cartesian<NamedVector> space = new Cartesian<>(new NamedVector(0, 0), 1, new ListGoalTester<>(goals));
+		return AStarSearch.autoHeuristic(space);
 	}
 	
-	static ArrayList<Point> searchGraphSpace() {
-		Point s = new Point("S", 0, 0);
-		Point a = new Point("A", 1, -1);
-		Point b = new Point("B", 1, 0);
-		Point c = new Point("C", 1, 1);
-		Point d = new Point("D", 2, 0);
-		Point e = new Point("E", 2, 1);
-		Point f = new Point("F", 3, 0);
-		Point g = new Point("G", 4, 0);
+	static GeneralSearch<NamedVector> graphSearch() {
+		NamedVector s = new NamedVector("S", 0, 0);
+		NamedVector a = new NamedVector("A", 1, -1);
+		NamedVector b = new NamedVector("B", 1, 0);
+		NamedVector c = new NamedVector("C", 1, 1);
+		NamedVector d = new NamedVector("D", 2, 0);
+		NamedVector e = new NamedVector("E", 2, 1);
+		NamedVector f = new NamedVector("F", 3, 0);
+		NamedVector g = new NamedVector("G", 4, 0);
 		
-		Graph<Point> space = new Graph<>(s, a, b, c, d, e, f, g);
+		Graph<NamedVector> space = new Graph<>(s, a, b, c, d, e, f, g);
 		space.connect(s, a, 6);
 		space.connect(s, b, 2);
 		space.connect(s, c, 1);
@@ -59,8 +57,8 @@ public class Main {
 		space.connect(f, g, 1);
 		space.setGoal(g);
 		
-		AStarSearch<Point> search = new AStarSearch<>(space, 
-				(StateSpace<Point> stateSpace, Point node) -> {
+		AStarSearch<NamedVector> search = new AStarSearch<>(space, 
+				(StateSpace<NamedVector> stateSpace, NamedVector node) -> {
 					if(node.equals(s)) return 6;
 					if(node.equals(a)) return 8;
 					if(node.equals(b)) return 6;
@@ -72,13 +70,6 @@ public class Main {
 				}
 		);
 		
-		return search.search();
+		return search;
 	}
-	
-	static <Node> void printPath(ArrayList<Node> path) {
-		String[] strings = new String[path.size()];
-		for(int i = 0; i < path.size(); i++) strings[i] = path.get(i).toString();
-		System.out.println(String.join(" -> ", strings));
-	}
-
 }
