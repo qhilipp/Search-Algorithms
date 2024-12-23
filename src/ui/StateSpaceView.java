@@ -19,9 +19,7 @@ import java.util.HashSet;
 
 import javax.swing.JPanel;
 
-import searchAlgorithms.AStarSearch;
 import searchAlgorithms.GeneralSearch;
-import stateSpace.StateSpace;
 import util.Copyable;
 import util.Measurement;
 import util.Nameable;
@@ -31,7 +29,6 @@ import util.Vector;
 
 public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener, ComponentListener {
 
-	private StateSpace<Node> space;
 	private GeneralSearch<Node> searchAlgorithm;
 	private Rectangle view;
 	private HashSet<Node> cachedNodes = new HashSet<>();
@@ -42,8 +39,9 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 	private ArrayList<Node> path = new ArrayList<>();
 	private Node selected = null;
 	private Dimension oldSize;
+	private int searchDelay = 100;
 	
-	public StateSpaceView(StateSpace<Node> space, GeneralSearch<Node> searchAlgorithm) {
+	public StateSpaceView(GeneralSearch<Node> searchAlgorithm) {
 		setSize(600, 600);
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -53,11 +51,11 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 		oldSize = getSize();
 		
 		int size = 6;
-		view = new Rectangle(space.getStart().getPosition().x() - size / 2, space.getStart().getPosition().y() - size / 2, size, size);
+		view = new Rectangle(searchAlgorithm.getStateSpace().getStart().getPosition().x() - size / 2, searchAlgorithm.getStateSpace().getStart().getPosition().y() - size / 2, size, size);
 		
-		setSpace(space);
 		this.searchAlgorithm = searchAlgorithm;
-		searchAlgorithm.initializeSearch();
+		cacheNodes();
+		initialize();
 	}
 	
 	@Override
@@ -79,7 +77,7 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 			g.setColor(fillColor);
 			g.fillOval((int) translatedOvalPosition.x(), (int) translatedOvalPosition.y(), getNodeSize(), getNodeSize());	
 			
-			for(Node neighbor : space.getNeighbors(node)) {
+			for(Node neighbor : searchAlgorithm.getStateSpace().getNeighbors(node)) {
 				boolean highlightArrow = arrowIsInPath(node, neighbor);
 				
 				Vector translatedNeighborCenter = spaceToPixel(neighbor.getPosition());
@@ -116,7 +114,7 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 			g.drawString(node.getName(), (int) namePosition.x(), (int) namePosition.y());
 			g.drawOval((int) translatedOvalPosition.x(), (int) translatedOvalPosition.y(), getNodeSize(), getNodeSize());
 			
-			if(space.isGoal(node)) {
+			if(searchAlgorithm.getStateSpace().isGoal(node)) {
 				int offset = 2;
 				g.drawOval((int) translatedOvalPosition.x() + offset, (int) translatedOvalPosition.y() + offset, getNodeSize() - 2 * offset, getNodeSize() - 2 * offset);
 			}
@@ -126,6 +124,7 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 	}
 	
 	private Color getNodeFillColor(Node node) {
+		if(searchAlgorithm.getStrategy().read().path.getLast().equals(node)) return Color.magenta;
 		if(path.contains(node)) return Color.green;
 		if(searchAlgorithm.minCostToNode.containsKey(node)) return new Color(101, 201, 235);
 		return Color.white;
@@ -173,7 +172,7 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 		nodes.addAll(cachedNodes);
 		
 		if(nodes.isEmpty()) {
-			nodes.add(space.getStart());
+			nodes.add(searchAlgorithm.getStateSpace().getStart());
 		}
 		
 		cachedNodes.clear();
@@ -182,7 +181,7 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 			Node node = nodes.remove(0);
 			cachedNodes.add(node);
 			
-			for(Node neighbor : space.getNeighbors(node)) {				
+			for(Node neighbor : searchAlgorithm.getStateSpace().getNeighbors(node)) {				
 				if(isInBounds(neighbor) && !cachedNodes.contains(neighbor)) {
 					nodes.add(neighbor);
 				}
@@ -196,7 +195,7 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 	
 	private boolean isInBounds(Node point, int depth) {
 		if(depth > 0) {
-			for(Node neighbor : space.getNeighbors(point)) {
+			for(Node neighbor : searchAlgorithm.getStateSpace().getNeighbors(point)) {
 				if(isInBounds(neighbor, depth-1)) return true;
 			}
 		}
@@ -222,21 +221,9 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 		return (int) (nodeFont.getSize() * 3);
 	}
 	
-	public StateSpace<Node> getSpace() {
-		return space;
-	}
-	
 	public void select(Node node) {
 		selected = node;
 		repaint();
-	}
-	
-	public void setSpace(StateSpace<Node> space) {
-		if(space.getStart().getPosition().getDimensions() != 2) {
-			return;
-		}
-		this.space = space;
-		cacheNodes();
 	}
 	
 	public void setSSVListener(SSVListener<Node> listener) {
@@ -245,7 +232,17 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 	
 	public void nextIteration() {
 		ArrayList<Node> path = searchAlgorithm.iterateSearch();
-		if(path != null) this.path = path;
+		if(path != null) {
+			this.path = path;
+			if(listener != null) listener.hasPathChanged(!this.path.isEmpty());
+		}
+		repaint();
+	}
+	
+	public void initialize() {
+		searchAlgorithm.initializeSearch();
+		path.clear();
+		if(listener != null) listener.hasPathChanged(!this.path.isEmpty());
 		repaint();
 	}
 
@@ -256,11 +253,15 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 				while(path.isEmpty()) {
 					nextIteration();
 					try {
-						Thread.sleep(100);
+						Thread.sleep(searchDelay);
 					} catch(Exception e) {}
 				}
 			}	
 		}).start();
+	}
+	
+	public void setSearchDelay(int delay) {
+		searchDelay = delay;
 	}
 	
 	@Override
