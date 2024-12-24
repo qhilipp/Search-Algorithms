@@ -17,7 +17,7 @@ public class StateSpaceWindow<Node extends Position&Nameable&Copyable> extends J
 	
 	public StateSpaceWindow(GeneralSearch<Node> searchAlgorithm) {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setSize(800, 600);
+		setSize(900, 700);
 		setLocationRelativeTo(null);
 		setLayout(new BorderLayout());
 		
@@ -25,7 +25,7 @@ public class StateSpaceWindow<Node extends Position&Nameable&Copyable> extends J
 		sse.setPreferredSize(new Dimension(200, 0));
 		add(sse, BorderLayout.WEST);
 		
-		ssv = new StateSpaceView<>(searchAlgorithm);
+		ssv = new StateSpaceView2D<>(searchAlgorithm);
 		add(ssv, BorderLayout.CENTER);
 		
 		ssv.setSSVListener(new SSVListener<Node>() {
