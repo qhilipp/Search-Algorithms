@@ -6,28 +6,48 @@ import stateSpace.Graph;
 import stateSpace.StateSpace;
 import ui.StateSpaceWindow;
 import util.NamedVector;
+import util.Vector;
 
 public class Main {
 
 	public static void main(String[] args) {
-		new StateSpaceWindow<>(cartesianSearch());
+		new StateSpaceWindow<>(mazeSearch());
 	}
 	
-	static GeneralSearch<NamedVector> cartesianSearch() {
-		NamedVector[] goals = { new NamedVector(4, 5) };
+	static GeneralSearch<Vector> mazeSearch() {
 		boolean[][] map = {
-				{ false, false, false, false, false, false, false },
-				{ false,  true,  true,  true,  true,  true, false },
-				{ false,  true,  true, false, false,  true, false },
-				{ false,  true, false,  true,  true,  true, false },
-				{ false,  true, false,  true,  true,  true, false },
-				{ false,  true, false,  true, false,  true, false },
-				{ false,  true, false,  true, false,  true, false },
-				{ false,  true, false,  true, false,  true, false },
-				{ false,  true, false,  true, false,  true, false },
-				{ false, false, false, false, false, false, false },
-		};
-		Cartesian<NamedVector> space = new Cartesian<>(new NamedVector(0, 0), 1, new ListGoalTester<>(goals));
+			    { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
+			    { false, true, true, true, false, true, false, false, false, false, true, false, false, false, false },
+			    { false, true, true, false, false, false, false, false, false, true, true, true, true, true, false },
+			    { false, true, false, false, true, false, true, false, false, true, false, true, false, false, false },
+			    { false, true, false, true, false, false, false, false, false, false, false, true, false, false, false },
+			    { false, true, false, false, false, false, false, false, true, true, false, true, false, true, false },
+			    { false, true, false, true, true, false, false, true, false, true, false, false, false, false, false },
+			    { false, true, true, true, true, false, true, true, false, false, false, true, true, false, false },
+			    { false, true, false, false, true, false, false, false, true, false, false, true, false, false, false },
+			    { false, true, false, false, false, true, true, true, true, false, false, true, true, false, false },
+			    { false, true, false, false, false, false, true, false, true, false, true, false, true, true, false },
+			    { false, true, false, true, true, true, true, false, false, false, true, false, true, true, false },
+			    { false, true, true, false, true, false, true, false, false, true, false, true, true, false, false },
+			    { false, true, true, true, true, true, true, true, true, true, true, true, true, true, false },
+			    { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false }
+			};
+
+		Cartesian<Vector> space = new Cartesian<>(
+			new Vector(1, 1),
+			2,
+			new ListGoalTester<>(new Vector(11, 7)),
+			map
+		);
+		return AStarSearch.autoHeuristic(space);
+	}
+	
+	static GeneralSearch<Vector> cartesianSearch() {
+		Cartesian<Vector> space = new Cartesian<>(
+			new Vector(0, 0),
+			1,
+			new ListGoalTester<>(new Vector(4, 5))
+		);
 		return AStarSearch.autoHeuristic(space);
 	}
 	
@@ -57,7 +77,8 @@ public class Main {
 		space.connect(f, g, 1);
 		space.setGoal(g);
 		
-		AStarSearch<NamedVector> search = new AStarSearch<>(space, 
+		AStarSearch<NamedVector> search = new AStarSearch<>(
+				space, 
 				(StateSpace<NamedVector> stateSpace, NamedVector node) -> {
 					if(node.equals(s)) return 6;
 					if(node.equals(a)) return 8;
