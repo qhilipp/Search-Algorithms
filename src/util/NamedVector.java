@@ -38,4 +38,9 @@ public class NamedVector extends Vector {
 		return new NamedVector(name, components);
 	}
 	
+	@Override
+	public String toString() {
+		return getName();
+	}
+	
 }

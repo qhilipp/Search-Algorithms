@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import javax.swing.JFrame;
 
 import searchAlgorithms.GeneralSearch;
-import stateSpace.StateSpace;
 import util.Copyable;
 import util.Nameable;
 import util.Position;
@@ -70,7 +69,6 @@ public class StateSpaceWindow<Node extends Position&Nameable&Copyable> extends J
 				double a = 5000 / (1 - Math.pow(100, -p));
 		        double b = 5000 - a;
 		        int delay = (int) (a * Math.pow(speed, -p) + b);
-		        System.out.println(delay);
 				ssv.setSearchDelay(delay);
 			}
 		});

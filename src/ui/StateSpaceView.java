@@ -20,6 +20,7 @@ import java.util.HashSet;
 import javax.swing.JPanel;
 
 import searchAlgorithms.GeneralSearch;
+import searchStrategy.SearchStrategy;
 import util.Copyable;
 import util.Measurement;
 import util.Nameable;
@@ -96,7 +97,7 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 				xPos[2] = (int) triangleCorners[2].x();
 				yPos[2] = (int) triangleCorners[2].y();
 				
-				g.setColor(highlightArrow ? Color.GREEN : Color.BLACK);
+				g.setColor(highlightArrow ? Color.magenta : Color.BLACK);
 				g.setStroke(highlightArrow ? new BasicStroke(3) : new BasicStroke(1));
 				g.fillPolygon(xPos, yPos, xPos.length);
 				
@@ -124,8 +125,10 @@ public class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPa
 	}
 	
 	private Color getNodeFillColor(Node node) {
-		if(searchAlgorithm.getStrategy().read().path.getLast().equals(node)) return Color.magenta;
-		if(path.contains(node)) return Color.green;
+		SearchStrategy<Node>.PathRating currentPathRating = searchAlgorithm.getStrategy().read();
+		if(path.isEmpty() && currentPathRating != null && currentPathRating.path.getLast().equals(node)) return Color.magenta;
+		if(path.contains(node)) return Color.magenta;
+		if(searchAlgorithm.minCostToVisitedNode.containsKey(node)) return new Color(100, 237, 113);
 		if(searchAlgorithm.minCostToNode.containsKey(node)) return new Color(101, 201, 235);
 		return Color.white;
 	}
