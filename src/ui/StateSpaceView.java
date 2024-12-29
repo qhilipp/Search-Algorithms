@@ -14,8 +14,11 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import javax.swing.JPanel;
 
@@ -25,7 +28,6 @@ import util.Copyable;
 import util.Measurement;
 import util.Nameable;
 import util.Position;
-import util.Rectangle;
 import util.Vector;
 
 public abstract class StateSpaceView<Node extends Position&Nameable&Copyable> extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener, ComponentListener {
@@ -33,7 +35,6 @@ public abstract class StateSpaceView<Node extends Position&Nameable&Copyable> ex
 	private GeneralSearch<Node> searchAlgorithm;
 	private HashSet<Node> cachedNodes = new HashSet<>();
 	private Vector dragStartLocation = null;
-	private Font nodeFont = new Font("Arial", Font.PLAIN, 15);
 	private SSVListener<Node> listener = null;
 	private int nodesOnScreen = 0;
 	private ArrayList<Node> path = new ArrayList<>();
@@ -41,9 +42,12 @@ public abstract class StateSpaceView<Node extends Position&Nameable&Copyable> ex
 	private Dimension oldSize;
 	private int searchDelay = 100;
 	
-	protected Rectangle view;
+	protected Vector position, size;
+	protected static final int viewSize = 6;
+	protected Font nodeFont = new Font("Arial", Font.PLAIN, 15);
+	protected int visibilityDepth = 1;
 	
-	public StateSpaceView(GeneralSearch<Node> searchAlgorithm, Rectangle view) {
+	public StateSpaceView(GeneralSearch<Node> searchAlgorithm, Vector position, Vector size) {
 		setSize(700, 700);
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -52,24 +56,22 @@ public abstract class StateSpaceView<Node extends Position&Nameable&Copyable> ex
 		
 		oldSize = getSize();
 		
-		this.view = view;
-		
 		this.searchAlgorithm = searchAlgorithm;
-		cacheNodes();
-		initialize();
+		this.position = position;
+		this.size = size;
 	}
 	
-	protected abstract Vector pixelToSpace(Vector pixelPosition);
 	protected abstract Vector spaceToPixel(Vector spacePosition);
 	protected abstract void dragged(Vector pixelDelta);
-	protected abstract void scrolled(double factor, Vector pixelPosition);
+	protected abstract void scrolled(double delta, Vector pixelPosition);
+	protected double drawOrder(Node node) {
+		return 1;
+	}
 	
-	protected void drawNode(Graphics2D g, Node node) {
+	protected void drawNode(Graphics2D g, Node node) {		
 		Vector translatedOvalPosition = spaceToPixel(node.getPosition());
 		translatedOvalPosition.translate(-getNodeSize() / 2, -getNodeSize() / 2);
 		Vector translatedOvalCenter = spaceToPixel(node.getPosition());
-		
-		if(!isInBounds(node)) return;
 		
 		Vector nameSize = getStringSize(g, node.getName());
 		Vector namePosition = translatedOvalCenter.translated(nameSize.x() * -0.5, nameSize.y() * 0.25);
@@ -120,27 +122,42 @@ public abstract class StateSpaceView<Node extends Position&Nameable&Copyable> ex
 		g.setStroke(highlighted ? new BasicStroke(3) : new BasicStroke(1));
 		g.fillPolygon(xPos, yPos, xPos.length);
 		
-		Vector neighborOffset = interpolate(to, from, getNodeSize() * 0.75);
-		Vector nodeOffset = interpolate(from, to, getNodeSize() / 2);
+		Vector neighborOffset = to.interpolated(from, getNodeSize() * 0.75);
+		Vector nodeOffset = from.interpolated(to, getNodeSize() / 2);
 				
 		g.drawLine((int) nodeOffset.x(), (int) nodeOffset.y(), (int) neighborOffset.x(), (int) neighborOffset.y());
 	}
 	
 	@Override
 	public void paint(Graphics g0) {
-		Graphics2D g = (Graphics2D) g0;
-		
+		BufferedImage img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
+		Graphics2D g = img.createGraphics();
+		g.setColor(new Color(245, 245, 245));
+		g.fillRect(0, 0, getWidth(), getHeight());
 		nodesOnScreen = 0;
 		
+		TreeMap<Double, ArrayList<Node>> treeMap = new TreeMap<>();
 		for(Node node : cachedNodes) {
-			for(Node neighbor : searchAlgorithm.getStateSpace().getNeighbors(node)) {
-				drawArrow(g, node, neighbor);
-			}
-			
-			drawNode(g, node);
-			
-			nodesOnScreen++;
+			double index = drawOrder(node);
+			if(!treeMap.containsKey(index)) treeMap.put(index, new ArrayList<>());
+			treeMap.get(index).add(node);
 		}
+		
+		for(Entry<Double, ArrayList<Node>> entry : treeMap.entrySet()) {
+			for(Node node : entry.getValue()) {				
+				if(!isInBounds(node)) continue;
+				
+				for(Node neighbor : searchAlgorithm.getStateSpace().getNeighbors(node)) {
+					drawArrow(g, node, neighbor);
+				}
+				
+				drawNode(g, node);
+				
+				nodesOnScreen++;
+			}
+		}
+		
+		g0.drawImage(img, 0, 0, null);
 	}
 	
 	private Color getNodeFillColor(Node node) {
@@ -163,21 +180,15 @@ public abstract class StateSpaceView<Node extends Position&Nameable&Copyable> ex
 		double width = getNodeSize() / 10 * size;
 		double height = getNodeSize() / 4 * size;
 		
-		Vector base = interpolate(to, from, height);
+		Vector base = to.interpolated(from, height);
 		Vector direction = from.translated(to.scaled(-1));
 		Vector perpendicularDirection = new Vector(-direction.y(), direction.x());
 		perpendicularDirection.setLength(Measurement.EUCLIDEAN, width);
 		
-		Vector a = interpolate(base.translated(perpendicularDirection), from, getNodeSize() / 2);
-		Vector b = interpolate(base.translated(perpendicularDirection.scaled(-1)), from, getNodeSize() / 2);
+		Vector a = base.translated(perpendicularDirection).interpolated(from, getNodeSize() / 2);
+		Vector b = base.translated(perpendicularDirection.scaled(-1)).interpolated(from, getNodeSize() / 2);
 		
-		return new Vector[] { interpolate(to, from, getNodeSize() / 2), a, b };
-	}
-	
-	private Vector interpolate(Vector a, Vector b, double length) {
-		double x = length / a.distance(b, Measurement.EUCLIDEAN);
-		Vector direction = b.translated(a.scaled(-1));
-		return a.translated(direction.scaled(x));
+		return new Vector[] { to.interpolated(from, getNodeSize() / 2), a, b };
 	}
 	
 	private Vector getStringSize(Graphics g, String text) {
@@ -189,7 +200,7 @@ public abstract class StateSpaceView<Node extends Position&Nameable&Copyable> ex
 		return new Vector(stringWidth, stringHeight);
 	}
 	
-	private void cacheNodes() {
+	protected void cacheNodes() {
 		ArrayList<Node> nodes = new ArrayList<>();
 		nodes.addAll(cachedNodes);
 		
@@ -209,10 +220,12 @@ public abstract class StateSpaceView<Node extends Position&Nameable&Copyable> ex
 				}
 			}
 		}
+		
+		repaint();
 	}
 	
 	private boolean isInBounds(Node node) {
-		return isInBounds(node, 1);
+		return isInBounds(node, visibilityDepth);
 	}
 	
 	private boolean isInBounds(Node node, int depth) {
@@ -221,6 +234,10 @@ public abstract class StateSpaceView<Node extends Position&Nameable&Copyable> ex
 				if(isInBounds(neighbor, depth-1)) return true;
 			}
 		}
+		return isVisible(node);
+	}
+	
+	protected boolean isVisible(Node node) {		
 		Vector position = spaceToPixel(node.getPosition());
 		return  position.x() >= 0 &&
 				position.x() <= getWidth() &&
@@ -251,6 +268,7 @@ public abstract class StateSpaceView<Node extends Position&Nameable&Copyable> ex
 	}
 	
 	public void initialize() {
+		cacheNodes();
 		searchAlgorithm.initializeSearch();
 		path.clear();
 		if(listener != null) listener.hasPathChanged(!this.path.isEmpty());
@@ -260,7 +278,7 @@ public abstract class StateSpaceView<Node extends Position&Nameable&Copyable> ex
 	public void continueSearch() {
 		new Thread(new Runnable() {
 			@Override
-			public void run() {				
+			public void run() {
 				while(path.isEmpty()) {
 					nextIteration();
 					try {
@@ -296,8 +314,6 @@ public abstract class StateSpaceView<Node extends Position&Nameable&Copyable> ex
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		dragStartLocation = null;
-		cacheNodes();
-		repaint();
 	}
 
 	@Override
@@ -311,6 +327,7 @@ public abstract class StateSpaceView<Node extends Position&Nameable&Copyable> ex
 		Vector pixelDelta = new Vector(-e.getX(), -e.getY()).translated(dragStartLocation);
 		dragged(pixelDelta);
 		dragStartLocation = new Vector(e.getX(), e.getY());
+		cacheNodes();
 		repaint();
 	}
 
@@ -322,7 +339,7 @@ public abstract class StateSpaceView<Node extends Position&Nameable&Copyable> ex
 		double scaleFactor = Math.min(1.08, 1 + -e.getPreciseWheelRotation() / 30);
 		if(nodesOnScreen > 200 && scaleFactor > 1) return;
 		
-		scrolled(scaleFactor, new Vector(e.getX(), e.getY()));
+		scrolled(e.getPreciseWheelRotation(), new Vector(e.getX(), e.getY()));
 		
 		if(e.getUnitsToScroll() == 0) cacheNodes();
 		
@@ -333,8 +350,8 @@ public abstract class StateSpaceView<Node extends Position&Nameable&Copyable> ex
 	public void componentResized(ComponentEvent e) {
 		double widthDelta = getWidth() / oldSize.getWidth();
 		double heightDelta = getHeight() / oldSize.getHeight();
-		view.size.set(0, view.size.get(0) * widthDelta);
-		view.size.set(1, view.size.get(1) * heightDelta);
+		size.set(0, size.get(0) * widthDelta);
+		size.set(1, size.get(1) * heightDelta);
 		oldSize = getSize();
 		cacheNodes();
 	}

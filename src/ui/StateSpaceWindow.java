@@ -25,7 +25,11 @@ public class StateSpaceWindow<Node extends Position&Nameable&Copyable> extends J
 		sse.setPreferredSize(new Dimension(200, 0));
 		add(sse, BorderLayout.WEST);
 		
-		ssv = new StateSpaceView2D<>(searchAlgorithm);
+		switch(searchAlgorithm.getStateSpace().getStart().getPosition().getDimensions()) {
+		case 2: ssv = new StateSpaceView2D<>(searchAlgorithm); break;
+		case 3: ssv = new StateSpaceView3D<>(searchAlgorithm); break;
+		}
+		ssv.setFocusable(true);
 		add(ssv, BorderLayout.CENTER);
 		
 		ssv.setSSVListener(new SSVListener<Node>() {
@@ -74,6 +78,7 @@ public class StateSpaceWindow<Node extends Position&Nameable&Copyable> extends J
 		});
 		
 		setVisible(true);
+		ssv.requestFocusInWindow();
 	}
 	
 }

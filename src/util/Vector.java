@@ -80,13 +80,78 @@ public class Vector implements Position, Nameable, Copyable {
 		return clone;
 	}
 	
-	public void uniform(Measurement measurement) {
+	public static double[][] matrixMultiplication(double[][] a, double[][] b) {
+		double[][] result = new double[a.length][b[0].length];
+		for(int i = 0; i < result.length; i++) {
+			for(int j = 0; j < result[0].length; j++) {
+				for(int k = 0; k < a[0].length; k++) {
+					result[i][j] += a[i][k] * b[k][j];
+				}
+			}
+		}
+		return result;
+	}
+	
+	public void rotate(Vector rotation) {
+		if(rotation.getDimensions() == 3) {
+			double[][] xRotation = new double[][] {
+				{ 1, 0, 0},
+				{ 0, Math.cos(rotation.x()), -Math.sin(rotation.x()) },
+				{ 0, Math.sin(rotation.x()), Math.cos(rotation.x()) }
+			};
+			double[][] yRotation = new double[][] {
+				{ Math.cos(rotation.y()), 0, Math.sin(rotation.y()) },
+				{ 0, 1, 0 },
+				{ -Math.sin(rotation.y()), 0, Math.cos(rotation.y()) }
+			};
+			double[][] zRotation = new double[][] {
+				{ Math.cos(rotation.z()), -Math.sin(rotation.z()), 0 },
+				{ Math.sin(rotation.z()), Math.cos(rotation.z()), 0 },
+				{ 0, 0, 1 }
+			};
+			rotate(yRotation, xRotation, zRotation);
+		}
+	}
+	
+	private void rotate(double[][]...matricies) {
+		double[][] componentsMatrix = new double[getDimensions()][1];
+		for(int i = 0; i < componentsMatrix.length; i++) {
+			componentsMatrix[i][0] = components[i];
+		}
+		for(double[][] matrix : matricies) {			
+			componentsMatrix = matrixMultiplication(matrix, componentsMatrix);
+		}
+		for(int i = 0; i < componentsMatrix.length; i++) {
+			components[i] = componentsMatrix[i][0];
+		}
+		
+	}
+	
+	public Vector rotated(Vector rotation) {
+		Vector clone = (Vector) this.copy();
+		clone.rotate(rotation);
+		return clone;
+	}
+	
+	public void interpolate(Vector to, double length) {
+		double x = length / distance(to, Measurement.EUCLIDEAN);
+		Vector direction = to.translated(scaled(-1));
+		translate(direction.scaled(x));
+	}
+	
+	public Vector interpolated(Vector to, double length) {
+		Vector clone = (Vector) this.copy();
+		clone.interpolate(to, length);
+		return clone;
+	}
+	
+	public void normalize(Measurement measurement) {
 		scale(1 / getLength(measurement));
 	}
 	
-	public Vector uniformed(Measurement measurement) {
+	public Vector normalized(Measurement measurement) {
 		Vector clone = (Vector) this.copy();
-		clone.uniform(measurement);
+		clone.normalize(measurement);
 		return clone;
 	}
 	
@@ -95,7 +160,7 @@ public class Vector implements Position, Nameable, Copyable {
 	}
 	
 	public void setLength(Measurement measurement, double length) {
-		uniform(measurement);
+		normalize(measurement);
 		scale(length);
 	}
 	
@@ -147,7 +212,7 @@ public class Vector implements Position, Nameable, Copyable {
 	@Override
 	public String toString() {
 		String[] components = new String[this.components.length];
-		for(int i = 0; i < components.length; i++) components[i] = this.components[i] + "";
+		for(int i = 0; i < components.length; i++) components[i] = ((int) (this.components[i] * 100)) / 100.0 + "";
 		return "(" + String.join(", ", components) + ")";
 	}
 	
