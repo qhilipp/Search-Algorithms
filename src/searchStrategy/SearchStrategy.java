@@ -46,7 +46,7 @@ public class SearchStrategy<Node> {
 	
 	private void insert(ArrayList<Node> path, double rating, ArrayList<PathRating> list) {
 		list.add(new PathRating(path, rating));
-		for(PathSorter<Node> pathSorter : pathSorters) {
+		for(PathSorter<Node> pathSorter : pathSorters.reversed()) {
 			list.sort(new Comparator<PathRating>() {
 				@Override
 				public int compare(SearchStrategy<Node>.PathRating o1, SearchStrategy<Node>.PathRating o2) {
