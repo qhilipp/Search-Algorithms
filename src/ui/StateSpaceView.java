@@ -82,13 +82,13 @@ public abstract class StateSpaceView<Node extends Position&Nameable&Copyable> ex
 		
 		Vector namePosition = translatedOvalCenter.translated(nodeSize * -0.5, 0);
 		
-		Color fillColor = getNodeFillColor(node);
+		Color fillColor = getDistanceColor(getNodeFillColor(node), getNodeVisibility(node));
 		
 		g.setStroke(new BasicStroke(1));
 		g.setColor(fillColor);
 		g.fillOval((int) translatedOvalPosition.x(), (int) translatedOvalPosition.y(), nodeSize, nodeSize);
 
-		g.setColor(Color.BLACK);
+		g.setColor(getDistanceColor(Color.black, getNodeVisibility(node)));
 		g.setStroke(new BasicStroke(node.equals(selected) ? 3 : 1));
 		
 		g.setFont(getNodeFont(node));
@@ -121,7 +121,7 @@ public abstract class StateSpaceView<Node extends Position&Nameable&Copyable> ex
 		xPos[2] = (int) triangleCorners[2].x();
 		yPos[2] = (int) triangleCorners[2].y();
 		
-		g.setColor(highlighted ? Color.magenta : Color.BLACK);
+		g.setColor(highlighted ? getDistanceColor(Color.magenta, getNodeVisibility(from)) : getDistanceColor(Color.black, getNodeVisibility(from)));
 		g.setStroke(highlighted ? new BasicStroke(3) : new BasicStroke(1));
 		g.fillPolygon(xPos, yPos, xPos.length);
 		
@@ -169,6 +169,16 @@ public abstract class StateSpaceView<Node extends Position&Nameable&Copyable> ex
 		g0.drawImage(img, 0, 0, null);
 	}
 	
+	private Color getDistanceColor(Color color, double distance) {
+		Color background = getBackground();
+		
+		int red = background.getRed() - (int) ((background.getRed() - color.getRed()) * distance);
+		int green = background.getGreen() - (int) ((background.getGreen() - color.getGreen()) * distance);
+		int blue = background.getBlue() - (int) ((background.getBlue() - color.getBlue()) * distance);
+		
+		return new Color(red, green, blue);
+	}
+	
 	private Color getNodeFillColor(Node node) {
 		SearchStrategy<Node>.PathRating currentPathRating = searchAlgorithm.getStrategy().read();
 		if(path.isEmpty() && currentPathRating != null && currentPathRating.path.getLast().equals(node)) return Color.magenta;
@@ -205,8 +215,8 @@ public abstract class StateSpaceView<Node extends Position&Nameable&Copyable> ex
 	}
 	
 	private Font getNodeFont(Node node) {
-		int fontSize = (int) Math.max(5, this.fontSize * getNodeVisibility(node));
-		return new Font("Arial", Font.PLAIN, fontSize);
+		float fontSize = (float) Math.max(5, this.fontSize * getNodeVisibility(node));
+		return new Font("Arial", Font.PLAIN, 1).deriveFont(fontSize);
 	}
 	
 	private int getNodeSize(Node node) {
