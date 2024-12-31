@@ -1,6 +1,5 @@
 package ui;
 
-import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.HashSet;
@@ -17,6 +16,7 @@ public class StateSpaceView3D<Node extends Position&Nameable&Copyable> extends S
 	private HashSet<Character> keys = new HashSet<>();
 	private Vector rotation = new Vector(0, 0, 0);
 	private double cameraVelocity = 0.04;
+	private double viewDistance = 4;
 	
 	public StateSpaceView3D(GeneralSearch<Node> searchAlgorithm) {
 		super(
@@ -30,7 +30,6 @@ public class StateSpaceView3D<Node extends Position&Nameable&Copyable> extends S
 		);
 		addKeyListener(this);
 		
-		nodeFont = new Font("Arial", Font.PLAIN, 12);
 		visibilityDepth = 0;
 		initialize();
 		
@@ -63,6 +62,13 @@ public class StateSpaceView3D<Node extends Position&Nameable&Copyable> extends S
 	private Vector spaceToCamera(Vector spacePosition) {
 		return spacePosition.translated(position.scaled(-1)).rotated(rotation.scaled(-1));
 	}
+	
+	@Override
+	protected double getNodeVisibility(Node node) {
+		double distance = spaceToCamera(node.getPosition()).getLength(Measurement.EUCLIDEAN);
+		double fraction = Math.min(1, Math.max(0, distance - 1) / viewDistance);
+		return 1 - fraction;
+	}
 
 	@Override
 	protected void dragged(Vector pixelDelta) {
@@ -83,12 +89,12 @@ public class StateSpaceView3D<Node extends Position&Nameable&Copyable> extends S
 	@Override
 	protected boolean isVisible(Node node) {
 		Vector cameraPosition = spaceToCamera(node.getPosition());
-		return super.isVisible(node) && cameraPosition.getLength(Measurement.EUCLIDEAN) <= 3.1 && cameraPosition.z() > 0.05;
+		return super.isVisible(node) && cameraPosition.getLength(Measurement.EUCLIDEAN) <= viewDistance && cameraPosition.z() > 0.05;
 	}
 	
 	@Override
 	protected double drawOrder(Node node) {
-		return -((Vector) node.getPosition().copy()).rotated(rotation).z();
+		return -spaceToCamera(node.getPosition()).z();
 	}
 	
 	private void updateKeyInputs() {

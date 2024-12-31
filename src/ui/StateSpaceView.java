@@ -7,6 +7,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
@@ -41,10 +42,11 @@ public abstract class StateSpaceView<Node extends Position&Nameable&Copyable> ex
 	private Node selected = null;
 	private Dimension oldSize;
 	private int searchDelay = 100;
+	private int fontSize = 15;
+	private Graphics2D g;
 	
 	protected Vector position, size;
 	protected static final int viewSize = 6;
-	protected Font nodeFont = new Font("Arial", Font.PLAIN, 15);
 	protected int visibilityDepth = 1;
 	
 	public StateSpaceView(GeneralSearch<Node> searchAlgorithm, Vector position, Vector size) {
@@ -67,45 +69,46 @@ public abstract class StateSpaceView<Node extends Position&Nameable&Copyable> ex
 	protected double drawOrder(Node node) {
 		return 1;
 	}
+	protected double getNodeVisibility(Node node) {
+		return 1;
+	}
 	
-	protected void drawNode(Graphics2D g, Node node) {		
+	private void drawNode(Node node) {
+		int nodeSize = getNodeSize(node);
+		
 		Vector translatedOvalPosition = spaceToPixel(node.getPosition());
-		translatedOvalPosition.translate(-getNodeSize() / 2, -getNodeSize() / 2);
+		translatedOvalPosition.translate(-nodeSize / 2, -nodeSize / 2);
 		Vector translatedOvalCenter = spaceToPixel(node.getPosition());
 		
-		Vector nameSize = getStringSize(g, node.getName());
-		Vector namePosition = translatedOvalCenter.translated(nameSize.x() * -0.5, nameSize.y() * 0.25);
+		Vector namePosition = translatedOvalCenter.translated(nodeSize * -0.5, 0);
 		
 		Color fillColor = getNodeFillColor(node);
 		
 		g.setStroke(new BasicStroke(1));
 		g.setColor(fillColor);
-		g.fillOval((int) translatedOvalPosition.x(), (int) translatedOvalPosition.y(), getNodeSize(), getNodeSize());	
+		g.fillOval((int) translatedOvalPosition.x(), (int) translatedOvalPosition.y(), nodeSize, nodeSize);
 
 		g.setColor(Color.BLACK);
 		g.setStroke(new BasicStroke(node.equals(selected) ? 3 : 1));
 		
+		g.setFont(getNodeFont(node));
 		g.drawString(node.getName(), (int) namePosition.x(), (int) namePosition.y());
-		g.drawOval((int) translatedOvalPosition.x(), (int) translatedOvalPosition.y(), getNodeSize(), getNodeSize());
+		g.drawOval((int) translatedOvalPosition.x(), (int) translatedOvalPosition.y(), nodeSize, nodeSize);
 		
 		if(searchAlgorithm.getStateSpace().isGoal(node)) {
 			int offset = 2;
-			g.drawOval((int) translatedOvalPosition.x() + offset, (int) translatedOvalPosition.y() + offset, getNodeSize() - 2 * offset, getNodeSize() - 2 * offset);
+			g.drawOval((int) translatedOvalPosition.x() + offset, (int) translatedOvalPosition.y() + offset, nodeSize - 2 * offset, nodeSize - 2 * offset);
 		}
 	}
 	
-	protected void drawArrow(Graphics2D g, Node from, Node to) {
+	private void drawArrow(Node from, Node to) {
 		if(arrowIsInPath(to, from)) return;
 		
-		boolean highlightArrow = arrowIsInPath(from, to);
+		boolean highlighted = arrowIsInPath(from, to);
 		
-		Vector translatedNodeCenter = spaceToPixel(from.getPosition());
-		Vector translatedNeighborCenter = spaceToPixel(to.getPosition());
-
-		drawArrow(g, translatedNodeCenter, translatedNeighborCenter, highlightArrow);
-	}
-	
-	protected void drawArrow(Graphics2D g, Vector from, Vector to, boolean highlighted) {
+		Vector fromPosition = spaceToPixel(from.getPosition());
+		Vector toPosition = spaceToPixel(to.getPosition());
+		
 		Vector[] triangleCorners = getTriangle(from, to, highlighted ? 2 : 1);
 		
 		int[] xPos = new int[3];
@@ -122,16 +125,22 @@ public abstract class StateSpaceView<Node extends Position&Nameable&Copyable> ex
 		g.setStroke(highlighted ? new BasicStroke(3) : new BasicStroke(1));
 		g.fillPolygon(xPos, yPos, xPos.length);
 		
-		Vector neighborOffset = to.interpolated(from, getNodeSize() * 0.75);
-		Vector nodeOffset = from.interpolated(to, getNodeSize() / 2);
-				
+		Vector neighborOffset = toPosition.interpolated(fromPosition, getNodeSize(to) * 0.75);
+		Vector nodeOffset = fromPosition.interpolated(toPosition, getNodeSize(from) / 2);
+		
+		if(neighborOffset.getLength(Measurement.MANHATTAN) > 5000 || nodeOffset.getLength(Measurement.MANHATTAN) > 5000) return;
+		
 		g.drawLine((int) nodeOffset.x(), (int) nodeOffset.y(), (int) neighborOffset.x(), (int) neighborOffset.y());
 	}
 	
 	@Override
 	public void paint(Graphics g0) {
 		BufferedImage img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
-		Graphics2D g = img.createGraphics();
+		g = img.createGraphics();
+		
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+		
 		g.setColor(new Color(245, 245, 245));
 		g.fillRect(0, 0, getWidth(), getHeight());
 		nodesOnScreen = 0;
@@ -142,16 +151,16 @@ public abstract class StateSpaceView<Node extends Position&Nameable&Copyable> ex
 			if(!treeMap.containsKey(index)) treeMap.put(index, new ArrayList<>());
 			treeMap.get(index).add(node);
 		}
-		
+
 		for(Entry<Double, ArrayList<Node>> entry : treeMap.entrySet()) {
 			for(Node node : entry.getValue()) {				
 				if(!isInBounds(node)) continue;
 				
 				for(Node neighbor : searchAlgorithm.getStateSpace().getNeighbors(node)) {
-					drawArrow(g, node, neighbor);
+					drawArrow(node, neighbor);
 				}
 				
-				drawNode(g, node);
+				drawNode(node);
 				
 				nodesOnScreen++;
 			}
@@ -176,30 +185,39 @@ public abstract class StateSpaceView<Node extends Position&Nameable&Copyable> ex
 		return false;
 	}
 	
-	private Vector[] getTriangle(Vector from, Vector to, double size) {
-		double width = getNodeSize() / 10 * size;
-		double height = getNodeSize() / 4 * size;
+	private Vector[] getTriangle(Node from, Node to, double size) {
+		double nodeSize = getNodeSize(to);
+		double width = nodeSize / 10 * size;
+		double height = nodeSize / 4 * size;
 		
-		Vector base = to.interpolated(from, height);
-		Vector direction = from.translated(to.scaled(-1));
+		Vector fromPosition = spaceToPixel(from.getPosition());
+		Vector toPosition = spaceToPixel(to.getPosition());
+		
+		Vector base = toPosition.interpolated(fromPosition, height);
+		Vector direction = fromPosition.translated(toPosition.scaled(-1));
 		Vector perpendicularDirection = new Vector(-direction.y(), direction.x());
 		perpendicularDirection.setLength(Measurement.EUCLIDEAN, width);
 		
-		Vector a = base.translated(perpendicularDirection).interpolated(from, getNodeSize() / 2);
-		Vector b = base.translated(perpendicularDirection.scaled(-1)).interpolated(from, getNodeSize() / 2);
+		Vector a = base.translated(perpendicularDirection).interpolated(fromPosition, nodeSize / 2);
+		Vector b = base.translated(perpendicularDirection.scaled(-1)).interpolated(fromPosition, nodeSize / 2);
 		
-		return new Vector[] { to.interpolated(from, getNodeSize() / 2), a, b };
+		return new Vector[] { toPosition.interpolated(fromPosition, nodeSize / 2), a, b };
 	}
 	
-	private Vector getStringSize(Graphics g, String text) {
-		FontMetrics fm = g.getFontMetrics(nodeFont);
-		
-		int stringWidth = fm.stringWidth(text);
-		int stringHeight = fm.getHeight();
-		
-		return new Vector(stringWidth, stringHeight);
+	private Font getNodeFont(Node node) {
+		int fontSize = (int) Math.max(5, this.fontSize * getNodeVisibility(node));
+		return new Font("Arial", Font.PLAIN, fontSize);
 	}
 	
+	private int getNodeSize(Node node) {
+		FontMetrics fm = g.getFontMetrics(getNodeFont(node));
+		
+		int padding = 2;		
+		int stringWidth = fm.stringWidth(node.getName());
+		
+		return stringWidth + 2 * padding;
+	}
+
 	protected void cacheNodes() {
 		ArrayList<Node> nodes = new ArrayList<>();
 		nodes.addAll(cachedNodes);
@@ -243,10 +261,6 @@ public abstract class StateSpaceView<Node extends Position&Nameable&Copyable> ex
 				position.x() <= getWidth() &&
 				position.y() >= 0 &&
 				position.y() <= getHeight();
-	}
-	
-	private int getNodeSize() {
-		return (int) (nodeFont.getSize() * 3);
 	}
 	
 	public void select(Node node) {
@@ -297,7 +311,7 @@ public abstract class StateSpaceView<Node extends Position&Nameable&Copyable> ex
 	public void mouseClicked(MouseEvent e) {
 		if(listener == null) return;
 		for(Node node : cachedNodes) {
-			if(spaceToPixel(node.getPosition()).distance(new Vector(e.getX(), e.getY()), Measurement.EUCLIDEAN) < getNodeSize() / 2) {
+			if(spaceToPixel(node.getPosition()).distance(new Vector(e.getX(), e.getY()), Measurement.EUCLIDEAN) < getNodeSize(node) / 2) {
 				listener.nodeSelected(node);
 				selected = node;
 				return;
