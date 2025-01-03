@@ -2,6 +2,10 @@ package searchStrategy;
 
 import java.util.ArrayList;
 
+/**
+ * sorts the paths based on their length in ascending order
+ * @param	<Node>	the node type used by the StateSpace
+ */
 public class BreadthFirst<Node> implements PathSorter<Node> {
 
 	@Override

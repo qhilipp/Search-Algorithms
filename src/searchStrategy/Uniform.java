@@ -2,6 +2,10 @@ package searchStrategy;
 
 import java.util.ArrayList;
 
+/**
+ * sorts the paths based on their rating in ascending order
+ * @param <Node>
+ */
 public class Uniform<Node> implements PathSorter<Node> {
 
 	@Override
