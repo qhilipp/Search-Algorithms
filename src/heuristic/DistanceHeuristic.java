@@ -8,40 +8,37 @@ import stateSpace.StateSpace;
 import util.Measurement;
 import util.Position;
 
-public class DistanceHeuristic<P extends Position> implements Heuristic<P> {
+/**
+ * a Heuristic that estimates the future cost by the distance to the closest goal node. It requires the StateSpace to have a ListGoalTester
+ * @param <Node>
+ */
+public class DistanceHeuristic<Node extends Position> implements Heuristic<Node> {
 
 	private Measurement measurement = Measurement.EUCLIDEAN;
-	private ArrayList<P> goals;
 	
-	public DistanceHeuristic(P...goals) {
-		this.goals = new ArrayList<>(Arrays.asList(goals));
-	}
+	/**
+	 * uses Measurement.EUCLIDEAN as a measurement
+	 */
+	public DistanceHeuristic() {}
 	
-	public DistanceHeuristic(ArrayList<P> goals) {
-		this.goals = goals;
-	}
-	
-	public DistanceHeuristic(Measurement measurement, ArrayList<P> goals) {
+	/**
+	 * @param 	measurement	the measurement that is being used
+	 */
+	public DistanceHeuristic(Measurement measurement) {
 		this.measurement = measurement;
-		this.goals = goals;
 	}
 	
 	@Override
-	public double futureCost(StateSpace<P> space, P node) {
+	public double futureCost(StateSpace<Node> space, Node node) {
 		double minDistance = Double.MAX_VALUE;
-		if(goals.isEmpty()) {
-			findGoals(space);
-		}
-		for(P goal : goals) minDistance = Math.min(minDistance, node.getPosition().distance(goal.getPosition(), measurement));
-		return minDistance;
-	}
-	
-	private void findGoals(StateSpace<P> space) {
+		ArrayList<Node> goals = new ArrayList<>();
+		
 		if(space.getGoalTester() instanceof ListGoalTester) {
-			goals = ((ListGoalTester<P>) space.getGoalTester()).getGoals();
-		} else {
-			// TODO: Find goals in space
+			goals = ((ListGoalTester<Node>) space.getGoalTester()).getGoals();
 		}
+		
+		for(Node goal : goals) minDistance = Math.min(minDistance, node.getPosition().distance(goal.getPosition(), measurement));
+		return minDistance;
 	}
 
 }
