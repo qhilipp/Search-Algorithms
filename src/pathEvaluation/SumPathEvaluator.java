@@ -4,6 +4,10 @@ import java.util.ArrayList;
 
 import stateSpace.StateSpace;
 
+/**
+ * sums the cost from every node to its successor in the path
+ * @param 	<Node>	the node type that the StateSpace uses
+ */
 public class SumPathEvaluator<Node> implements PathEvaluator<Node> {
 
 	@Override

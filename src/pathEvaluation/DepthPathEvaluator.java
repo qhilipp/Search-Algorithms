@@ -4,6 +4,10 @@ import java.util.ArrayList;
 
 import stateSpace.StateSpace;
 
+/**
+ * uses the length of the path for its cost
+ * @param <Node>
+ */
 public class DepthPathEvaluator<Node> implements PathEvaluator<Node> {
 
 	@Override
