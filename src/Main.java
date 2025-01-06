@@ -11,13 +11,13 @@ import util.Vector;
 public class Main {
 
 	public static void main(String[] args) {
-		new StateSpaceWindow<>(cartesian3DSearch());
+		new StateSpaceWindow<>(cartesian2DSearch());
 	}
 	
 	static GeneralSearch<Vector> cartesian2DSearch() {
 		Cartesian<Vector> space = new Cartesian<>(
 				new Vector(0, 0),
-				2,
+				1,
 				new ListGoalTester<>(new Vector(4, 5))
 				);
 		return AStarSearch.autoHeuristic(space);
