@@ -2,8 +2,9 @@
 
 This repository is a library containing search algorithms to find paths in State Spaces. It relies on [CS165A](https://sites.cs.ucsb.edu/~xyan/classes/CS165A-2024fall/syllabus.html) at UCSB. It is ment to serve as a help to understanding the different search algorithms, how they work and to test them out on your own. You can also experiment and add more algorithms on your own.
 
-![3D-screenshot](3D-screenshot.jpg)
-![2D-screenshot](2D-screenshot.jpg)
+3D View                              |  2D View
+:-----------------------------------:|:------------------------------------:
+![3D-screenshot](3D-screenshot.jpg)  |  ![2D-screenshot](2D-screenshot.jpg)
 
 ## Structure
 The repository contains multple packages, each usually containing one abstract class or interface and some implementations of them. The packages are:
