@@ -72,15 +72,20 @@ public abstract class StateSpaceView<Node extends Position&Nameable&Copyable> ex
 	protected double getNodeVisibility(Node node) {
 		return 1;
 	}
+	protected int getNodeSize(Node node) {
+		return 40;
+	}
 	
 	private void drawNode(Node node) {
 		int nodeSize = getNodeSize(node);
+		int nodeTextWidth = getNodeTextWidth(node);
+		int nodeTextHeight = getNodeTextHeight(node);
 		
 		Vector translatedOvalPosition = spaceToPixel(node.getPosition());
 		translatedOvalPosition.translate(-nodeSize / 2, -nodeSize / 2);
 		Vector translatedOvalCenter = spaceToPixel(node.getPosition());
 		
-		Vector namePosition = translatedOvalCenter.translated(nodeSize * -0.5, 0);
+		Vector namePosition = translatedOvalCenter.translated(nodeTextWidth * -0.5, nodeTextHeight * 0.25);
 		
 		Color fillColor = getDistanceColor(getNodeFillColor(node), getNodeVisibility(node));
 		
@@ -219,13 +224,14 @@ public abstract class StateSpaceView<Node extends Position&Nameable&Copyable> ex
 		return new Font("Arial", Font.PLAIN, 1).deriveFont(fontSize);
 	}
 	
-	private int getNodeSize(Node node) {
+	protected int getNodeTextWidth(Node node) {
 		FontMetrics fm = g.getFontMetrics(getNodeFont(node));
-		
-		int padding = 2;		
-		int stringWidth = fm.stringWidth(node.getName());
-		
-		return stringWidth + 2 * padding;
+		return (int) fm.getStringBounds(node.getName(), g).getWidth();
+	}
+	
+	protected int getNodeTextHeight(Node node) {
+		FontMetrics fm = g.getFontMetrics(getNodeFont(node));
+		return (int) fm.getStringBounds(node.getName(), g).getHeight();
 	}
 
 	protected void cacheNodes() {

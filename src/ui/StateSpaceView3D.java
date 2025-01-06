@@ -97,6 +97,11 @@ public class StateSpaceView3D<Node extends Position&Nameable&Copyable> extends S
 		return -spaceToCamera(node.getPosition()).z();
 	}
 	
+	@Override
+	protected int getNodeSize(Node node) {
+		return getNodeTextWidth(node) + 8;
+	}
+	
 	private void updateKeyInputs() {
 //		if(keys.contains('w')) position.translate(getCameraDirection().scaled(cameraVelocity));
 //		if(keys.contains('s')) position.translate(getCameraDirection().scaled(-cameraVelocity));
