@@ -10,12 +10,22 @@ import util.Position;
 import util.Vector;
 import util.Copyable;
 
+/**
+ * a potentially infinite graph of nodes arranged in an n-dimensional Cartesian space
+ * @param	<Node>	the node type of the StateSpace
+ */
 public class Cartesian<Node extends Position&Nameable&Copyable> extends StateSpace<Node> {
 
 	private int multiDimensionalMoveLimit;
 	private Measurement measurement = Measurement.EUCLIDEAN;
 	private HashMap<Vector, Boolean> map = new HashMap<>();
 	
+	/**
+	 * @param	start						the starting node
+	 * @param	multiDimensionalMoveLimit	the maximum number of dimensions two neighboring nodes can be different from each other to still have a connection between each other
+	 * @param 	goalTester					the goal tester
+	 * @param 	map							a 3-dimensional boolean array indicating which nodes can have neighbors and which cannot
+	 */
 	public Cartesian(Node start, int multiDimensionalMoveLimit, GoalTester<Node> goalTester, boolean[][][] map) {
 		super(start, goalTester);
 		this.multiDimensionalMoveLimit = multiDimensionalMoveLimit;
@@ -28,6 +38,12 @@ public class Cartesian<Node extends Position&Nameable&Copyable> extends StateSpa
 		}
 	}
 	
+	/**
+	 * @param	start						the starting node
+	 * @param	multiDimensionalMoveLimit	the maximum number of dimensions two neighboring nodes can be different from each other to still have a connection between each other
+	 * @param 	goalTester					the goal tester
+	 * @param 	map							a 2-dimensional boolean array indicating which nodes can have neighbors and which cannot
+	 */
 	public Cartesian(Node start, int multiDimensionalMoveLimit, GoalTester<Node> goalTester, boolean[][] map) {
 		super(start, goalTester);
 		this.multiDimensionalMoveLimit = multiDimensionalMoveLimit;
@@ -38,12 +54,23 @@ public class Cartesian<Node extends Position&Nameable&Copyable> extends StateSpa
 		}
 	}
 	
+	/**
+	 * @param	start						the starting node
+	 * @param	multiDimensionalMoveLimit	the maximum number of dimensions two neighboring nodes can be different from each other to still have a connection between each other
+	 * @param 	goalTester					the goal tester
+	 * @param 	map							a HashMap indicating which nodes can have neighbors and which cannot
+	 */
 	public Cartesian(Node start, int multiDimensionalMoveLimit, GoalTester<Node> goalTester, HashMap<Vector, Boolean> map) {
 		super(start, goalTester);
 		this.multiDimensionalMoveLimit = multiDimensionalMoveLimit;
 		this.map = map;
 	}
 	
+	/**
+	 * @param	start						the starting node
+	 * @param	multiDimensionalMoveLimit	the maximum number of dimensions two neighboring nodes can be different from each other to still have a connection between each other
+	 * @param 	goalTester					the goal tester
+	 */
 	public Cartesian(Node start, int multiDimensionalMoveLimit, GoalTester<Node> goalTester) {
 		super(start, goalTester);
 		this.multiDimensionalMoveLimit = multiDimensionalMoveLimit;
@@ -76,10 +103,18 @@ public class Cartesian<Node extends Position&Nameable&Copyable> extends StateSpa
 		return from.getPosition().distance(to.getPosition(), measurement);
 	}
 	
+	/**
+	 * @return	the number of dimensions that the StateSpace has
+	 */
 	public int getDimensions() {
 		return getStart().getPosition().getDimensions();
 	}
 	
+	/**
+	 * a helper function for the neighbor calculation
+	 * @param 	length	the length of the sub-arrays
+	 * @return	the array of all sub-arrays of the specified length
+	 */
 	public int[][] generateSubsets(int length) {
         ArrayList<int[]> result = new ArrayList<>();
 
@@ -102,35 +137,67 @@ public class Cartesian<Node extends Position&Nameable&Copyable> extends StateSpa
         return result.toArray(new int[0][]);
     }
 	
+	/**
+	 * @return	the maximum number of dimensions two neighboring nodes can be different from each other to still have a connection between each other
+	 */
 	public int getMultiDimensionalMoveLimit() {
 		return multiDimensionalMoveLimit;
 	}
 	
+	/**
+	 * sets the maximum number of dimensions two neighboring nodes can be different from each other to still have a connection between each other
+	 * @param multiDimensionalMoveLimit	the new value
+	 */
 	public void setMultiDimensionalMoveLimit(int multiDimensionalMoveLimit) {
 		this.multiDimensionalMoveLimit = multiDimensionalMoveLimit;
 	}
 	
+	/**
+	 * @return	the measurement that is being used for distance calculations
+	 */
 	public Measurement getMeasurement() {
 		return measurement;
 	}
 	
+	/**
+	 * sets the measurement that is being used for distance calculations
+	 * @param measurement	the new value
+	 */
 	public void setMeasurement(Measurement measurement) {
 		this.measurement = measurement;
 	}
 	
-	public boolean getMap(Vector position) {
+	/**
+	 * @param	position	the position of the node of which the state is requested
+	 * @return	whether or not the node at the given position
+	 */
+	public boolean isEnabled(Vector position) {
 		return map.containsKey(position) && map.get(position);
 	}
 	
-	public void toggleMap(Node node) {
-		map.put(node.getPosition(), !getMap(node.getPosition()));
+	/**
+	 * toggles whether or not the given node is enabled
+	 * @param 	node	the node that is being toggled
+	 */
+	public void toggleEnabled(Node node) {
+		map.put(node.getPosition(), !isEnabled(node.getPosition()));
 	}
 	
-	public void setMap(boolean value, Node node) {
+	/**
+	 * enables or disables the given node according to the given boolean
+	 * @param 	value	whether or not the given node should be enabled
+	 * @param 	node	the node that should be modified
+	 */
+	public void setEnabled(boolean value, Node node) {
 		map.put(node.getPosition(), value);
 	}
 	
-	public void setMap(boolean value, double...components) {
+	/**
+	 * enables or disables the node with the given position components according to the given boolean
+	 * @param 	value		whether or not the given node should be enabled
+	 * @param 	components	the components of the position of the node that should be modified
+	 */
+	public void setEnabled(boolean value, double...components) {
 		map.put(new Vector(components), value);
 	}
 }
