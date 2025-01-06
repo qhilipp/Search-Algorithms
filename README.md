@@ -2,9 +2,12 @@
 
 This repository is a library containing search algorithms to find paths in State Spaces. It relies on [CS165A](https://sites.cs.ucsb.edu/~xyan/classes/CS165A-2024fall/syllabus.html) at UCSB. It is ment to serve as a help to understanding the different search algorithms, how they work and to test them out on your own. You can also experiment and add more algorithms on your own.
 
+![3D-screenshot](3D-screenshot.jpg)
+![2D-screenshot](2D-screenshot.jpg)
+
 ## Structure
 The repository contains multple packages, each usually containing one abstract class or interface and some implementations of them. The packages are:
-* [(default package)](#try-it-out-yourself-)
+* [(default package)](#how-to-get-started-)
 * [searchAlgorithms](#included-search-algorithms-)
 * [stateSpace](#stateSpace-)
 * [goalTest](#goalTester-)
@@ -13,9 +16,10 @@ The repository contains multple packages, each usually containing one abstract c
 * [loopHandling](#loopHandler-)
 * [searchStrategy](#searchStrategy-)
 * [util](#utilities-)
+* [ui](#ui-)
 
-## Try it out yourself 🧪
-The default package of this project contains the Main.java file, which contains the main method and a couple of methods for testing the algorithms. Feel free to play around in this file. If you want to create your own SearchAlgorithm, just open the [searchAlgorithms](src/searchAlgorithms) package, add a new generic class that inherits from [GeneralSearch](#generalSearch-) and implement a constructor that calls the super constructor. You can orient yourself to the other classes in the package. The same is true if you want to add your own [SearchStrategy](#searchStrategy-), [GoalTester](#goalTest-), etc.
+## How to get started 🏁
+Just clone the repository and make sure that a modern Java version is installed, other dipendendies are not needed. The default package of this project contains the Main.java file, which contains the main method and a couple of methods for testing the algorithms. Feel free to play around in this file. If you want to create your own SearchAlgorithm, just open the [searchAlgorithms](src/searchAlgorithms) package, add a new generic class that inherits from [GeneralSearch](#generalSearch-) and implement a constructor that calls the super constructor. You can orient yourself to the other classes in the package. The same is true if you want to add your own [SearchStrategy](#searchStrategy-), [GoalTester](#goalTest-), etc.
 
 ## GeneralSearch 🕵
 All included Search Algorithms rely on the GeneralSearch algorithm. This algorithm
@@ -106,3 +110,6 @@ The repository also comes with some utility classes; those include:
 	- An interface that should be implemented by classes that have a vector for a position. This interface allows you to use DistanceHeuristic for your own custom types that implement this interface, rather than just Vectors. This repository already contains a common implementation for this interface:
 		* Point
 			- A class with a position and a name, e.g., used for Graph StateSpaces.
+
+## UI 💻
+The UI consists of a StateSpaceWindow which contains a StateSpaceSidebar and a StateSpaceView. StateSpaceView is an abstract class that is being extended from StateSpaceView2D and StateSpaceView3D.
