@@ -16,7 +16,7 @@ public class StateSpaceView3D<Node extends Position&Nameable&Copyable> extends S
 	private HashSet<Character> keys = new HashSet<>();
 	private Vector rotation = new Vector(0, 0, 0);
 	private double cameraVelocity = 0.04;
-	private double viewDistance = 4.5;
+	private double viewDistance = 4;
 	
 	public StateSpaceView3D(GeneralSearch<Node> searchAlgorithm) {
 		super(

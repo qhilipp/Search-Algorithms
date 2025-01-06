@@ -26,7 +26,7 @@ import util.Copyable;
 import util.Nameable;
 import util.Position;
 
-public class StateSpaceEditor<Node extends Position & Nameable & Copyable> extends JPanel {
+public class StateSpaceSidebar<Node extends Position & Nameable & Copyable> extends JPanel {
 
     private GeneralSearch<Node> searchAlgorithm;
     private Node selected = null;
@@ -44,7 +44,7 @@ public class StateSpaceEditor<Node extends Position & Nameable & Copyable> exten
 
     private SSEListener<Node> listener;
 
-    public StateSpaceEditor(GeneralSearch<Node> searchAlgorithm) {
+    public StateSpaceSidebar(GeneralSearch<Node> searchAlgorithm) {
         this.searchAlgorithm = searchAlgorithm;
 
         setBackground(Color.LIGHT_GRAY);

@@ -13,7 +13,7 @@ import util.Position;
 public class StateSpaceWindow<Node extends Position&Nameable&Copyable> extends JFrame {
 
 	private StateSpaceView<Node> ssv;
-	private StateSpaceEditor<Node> sse;
+	private StateSpaceSidebar<Node> sse;
 	
 	public StateSpaceWindow(GeneralSearch<Node> searchAlgorithm) {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -21,7 +21,7 @@ public class StateSpaceWindow<Node extends Position&Nameable&Copyable> extends J
 		setLocationRelativeTo(null);
 		setLayout(new BorderLayout());
 		
-		sse = new StateSpaceEditor<>(searchAlgorithm);
+		sse = new StateSpaceSidebar<>(searchAlgorithm);
 		sse.setPreferredSize(new Dimension(200, 0));
 		add(sse, BorderLayout.WEST);
 		
